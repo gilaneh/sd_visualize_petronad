@@ -17,14 +17,13 @@
     'category': 'Service Desk/Service Desk',
     'application': True,
     'installable': True,
-    'version': '1.1.0',
+    'version': '1.1.1',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'web', 'sd_visualize', ],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
         ],
     'assets': {
         'web._assets_common_scripts': [
