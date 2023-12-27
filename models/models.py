@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+import logging
 
 from odoo import models, fields, api, _
 from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
+from dateutil.rrule import *
 import jdatetime
+from odoo.exceptions import AccessError, ValidationError, MissingError, UserError
 import json
 
 class SdVisualizePetronadCalculate(models.Model):
@@ -10,69 +14,53 @@ class SdVisualizePetronadCalculate(models.Model):
 
     def calculate(self, function_name, diagram_id):
         res = super(SdVisualizePetronadCalculate, self).calculate(function_name, diagram_id)
-        if function_name != 'petronad_ethylene_daily':
-            return res
+        try:
+            if function_name == 'petronad_ethylene_daily':
+                res['value'] = self.petronad_ethylene_daily(diagram_id)
+            elif function_name == 'petronad_ethylene_weekly':
+                res['value'] = self.petronad_ethylene_weekly(diagram_id)
+        except Exception as err:
+            logging.error(f'CALCULATION:{function_name}/ {err}')
+            raise ValidationError(f'CALCULATION:{function_name}/ {err}')
         # print(f'-------> SdVcalculateDataPetronad {function_name} {diagram_id} {res}')
-        res['value'] = self.petronad_ethylene_daily(diagram_id)
         return res
 
 
     def petronad_ethylene_daily(self, diagram=0, start_date=date.today() - timedelta(days=30), end_date=date.today()):
         diagram = self.env['sd_visualize.diagram'].browse(diagram)
-        print(f'calculate \n CALCULATE {diagram.values} \n {diagram}  self: {self}'
-              f'\n {sorted(diagram.values, key=lambda val: val["sequence"])}')
         date_format = '%Y/%m/%d'
         calendar = self.env.context.get('lang')
-        # report_date = datetime.strptime(report_date, date_format).date()
+        value_model = self.env['sd_visualize.values']
+
+        productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),],order='production_date desc', limit=3,)
+        if len(productions) == 0:
+            raise ValidationError(f'Production not found')
+        storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),('storage_date', '<=', productions[0].production_date)],order='id desc', limit=1,)
+        if  len(storages) == 0:
+            raise ValidationError(f'Storage not found')
+        tanks = self.env['km_petronad.tanks'].search([('project', '=', diagram.project.id),('tanks_date', '<=', productions[0].production_date)],order='id desc', limit=1,)
+        if  len(tanks) == 0:
+            raise ValidationError(f'Tank not found')
+        comments = self.env['km_petronad.comments'].search([('project', '=', diagram.project.id),('date', '=', productions[0].production_date)], order='sequence desc')
 
         if calendar == 'fa_IR':
-            first_day = jdatetime.date.fromgregorian(date=end_date).replace(day=1)
-            next_month = first_day.replace(day=28) + timedelta(days=5)
-            last_day = (next_month - timedelta(days=next_month.day)).togregorian()
-            first_day = first_day.togregorian
-            s_start_date = jdatetime.date.fromgregorian(date=start_date).strftime("%Y/%m/%d")
-            s_end_date = jdatetime.date.fromgregorian(date=end_date).strftime("%Y/%m/%d")
+            # first_day = jdatetime.date.fromgregorian(date=end_date).replace(day=1)
+            # next_month = first_day.replace(day=28) + timedelta(days=5)
+            # last_day = (next_month - timedelta(days=next_month.day)).togregorian()
+            # first_day = first_day.togregorian
+            s_start_date = jdatetime.date.fromgregorian(date=productions[0].production_date).strftime("%Y/%m/%d")
+            s_storage_date = jdatetime.date.fromgregorian(date=storages.storage_date).strftime("%Y/%m/%d")
+            # s_end_date = jdatetime.date.fromgregorian(date=end_date).strftime("%Y/%m/%d")
 
         else:
-            first_day = end_date.replace(day=1)
-            next_month = first_day.replace(day=28) + timedelta(days=5)
-            last_day = next_month - timedelta(days=next_month.day)
-            s_start_date = start_date.strftime("%Y/%m/%d")
-            s_end_date = end_date.strftime("%Y/%m/%d")
-        value_model = self.env['sd_visualize.values']
-        feeds = self.env['km_data.feeds'].search([('feeds_date', '>=', start_date),
-                                                  ('feeds_date', '<=', end_date), ], order='feeds_date desc')
-        productions_list = self.env['km_data.production'].search([('production_date', '>=', start_date),
-                                                                  ('production_date', '<=', end_date), ])
-        sale_list = self.env['km_data.sale'].search([('sale_date', '>=', start_date),
-                                                     ('sale_date', '<=', end_date), ])
-
-        meg_production_list = [rec.meg_production for rec in productions_list]
-        deg_production_list = [rec.deg_production for rec in productions_list]
-        teg_production_list = [rec.teg_production for rec in productions_list]
-        h1_production_list = [rec.h1_production for rec in productions_list]
-        h2_production_list = [rec.h2_production for rec in productions_list]
-
-        meg_sale_list = [rec.meg_sale for rec in sale_list]
-        deg_sale_list = [rec.deg_sale for rec in sale_list]
-        teg_sale_list = [rec.teg_sale for rec in sale_list]
-        h2_sale_list = [rec.h2_sale for rec in sale_list]
-
-        feeds_in = [rec.feed_in for rec in feeds]
-        feeds_out = [rec.feed_out for rec in feeds]
+            # first_day = end_date.replace(day=1)
+            # next_month = first_day.replace(day=28) + timedelta(days=5)
+            # last_day = next_month - timedelta(days=next_month.day)
+            s_start_date = productions[0].production_date.strftime("%Y/%m/%d")
+            s_storage_date = storages.storage_date.strftime("%Y/%m/%d")
+            # s_end_date = end_date.strftime("%Y/%m/%d")
 
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
-        meg_production = 0
-        deg_production = 0
-        teg_production = 0
-        h1_production = 0
-        h2_production = 0
-        ww_production = 0
-
-        meg_sale = 0
-        deg_sale = 0
-        teg_sale = 0
-        h2_sale = 0
 
         results = []
         for rec in sorted_values:
@@ -80,47 +68,122 @@ class SdVisualizePetronadCalculate(models.Model):
             if not rec.calculate:
                 continue
 
-            if rec.variable_name == 'first_date':
+            if rec.variable_name == 'report_date':
                 value = s_start_date
-            elif rec.variable_name == 'last_date':
-                value = s_end_date
-            elif rec.variable_name == 'feed_production':
+            # MEG
+            elif rec.variable_name == 'meg_production':
+                value = self.float_num(productions[0].meg_production, 2)
+            # DEG
+            elif rec.variable_name == 'deg_production':
+                value = self.float_num(productions[0].deg_production, 2)
+            # TEG
+            elif rec.variable_name == 'teg_production':
+                value = self.float_num(productions[0].teg_production, 2)
+            # H1
+            elif rec.variable_name == 'h1_production':
+                value = self.float_num(productions[0].h1_production, 2)
+            # H2
+            elif rec.variable_name == 'h2_production':
+                value = self.float_num(productions[0].h2_production, 2)
+            # WW
+            elif rec.variable_name == 'ww_production':
+                value = self.float_num(productions[0].ww_production, 2)
+            # Feed
+            elif rec.variable_name == 'feed':
+                value = self.float_num(productions[0].feed, 2)
+            # Workers
+            elif rec.variable_name == 'workers':
+                value = self.float_num(productions[0].workers, 2)
+            # MEG
+            elif rec.variable_name == 'meg_storage':
+                value = self.float_num(storages.meg_storage, 2)
+            # DEG
+            elif rec.variable_name == 'deg_storage':
+                value = self.float_num(storages.deg_storage, 2)
+            # TEG
+            elif rec.variable_name == 'teg_storage':
+                value = self.float_num(storages.teg_storage, 2)
+            # H1
+            elif rec.variable_name == 'h1_storage':
+                value = self.float_num(storages.h1_storage, 2)
+            # H2
+            elif rec.variable_name == 'h2_storage':
+                value = self.float_num(storages.h2_storage, 2)
+            # WW
+            elif rec.variable_name == 'ww_storage':
+                value = self.float_num(storages.ww_storage, 2)
+            # Feed
+            elif rec.variable_name == 'feed_storage':
+                value = self.float_num(storages.feed_storage, 2)
+            # storage_date
+            elif rec.variable_name == 'storage_date':
+                value = s_storage_date
+
+            # MEG
+            elif rec.variable_name == 'meg_tank':
+                value = self.float_num(tanks.meg_tank - storages.meg_storage, 2)
+            # DEG
+            elif rec.variable_name == 'deg_tank':
+                value = self.float_num(tanks.deg_tank - storages.deg_storage, 2)
+            # TEG
+            elif rec.variable_name == 'teg_tank':
+                value = self.float_num(tanks.teg_tank - storages.teg_storage, 2)
+            # H1
+            elif rec.variable_name == 'h1_tank':
+                value = self.float_num(tanks.h1_tank - storages.h1_storage, 2)
+            # H2
+            elif rec.variable_name == 'h2_tank':
+                value = self.float_num(tanks.h2_tank - storages.h2_storage, 2)
+            # WW
+            elif rec.variable_name == 'ww_tank':
+                value = self.float_num(tanks.ww_tank - storages.ww_storage, 2)
+            # Feed
+            elif rec.variable_name == 'feed_tank':
+                value = self.float_num(tanks.feed_tank_1 + tanks.feed_tank_2 - storages.feed_storage, 2)
+            # Commnets
+            elif rec.variable_name == 'comments':
+                if len(comments) > 0:
+                    value = '\n'.join(list([rec.comment for rec in comments]))
+                else:
+                    value = ''
+
+            elif rec.variable_name == 'chart_1':
                 trace1 = {
-                    'x': ['Two days before', 'The day before', 'That day'],
-                    'y': [25, 28, 23],
+                    'x': ['Two days', 'day before', 'That day'],
+                    'y': [productions[2].feed, productions[1].feed, productions[0].feed],
                     'name': 'Feed',
                     'type': 'bar'
                 };
                 trace2 = {
-                    'x': ['Two days before', 'The day before', 'That day'],
-                    'y': [14, 12, 12],
+                    'x': ['Two days', 'day before', 'That day'],
+                    'y': [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production],
                     'name': 'MEG',
                     'type': 'bar'
                 };
                 trace3 = {
-                    'x': ['Two days before', 'The day before', 'That day'],
-                    'y': [11, 10, 9],
+                    'x': ['Two days', 'day before', 'That day'],
+                    'y': [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production],
                     'name': 'H1',
                     'type': 'bar'
                 };
 
                 value = json.dumps([trace1, trace2, trace3])
-            # FEED
-            # elif rec.variable_name == 'feed_in':
-            #     value = self.float_num(sum(feeds_in), 2)
-            # elif rec.variable_name == 'feed_out':
-            #     feed_out = round(sum(feeds_out), 2)
-            #     value = self.float_num(sum(feeds_out), 2)
-            # elif rec.variable_name == 'feed_stock':
-            #     if len(feeds) > 0:
-            #         value = self.float_num(feeds[0].feed_stock, 2)
-            #     else:
-            #         value = '0'
-            #
-            # # MEG
-            # elif rec.variable_name == 'meg_production':
-            #     meg_production = round(sum(meg_production_list), 2)
-            #     value = self.float_num(sum(meg_production_list), 2)
+
+            elif rec.variable_name == 'chart_2':
+                trace1 = {
+                    'x': ['Two days', 'day before', 'That day'],
+                    'y': [productions[2].feed * 100 / 30, productions[1].feed * 100 / 30, productions[0].feed * 100 / 30],
+                    # 'text': [productions[2].feed * 100 / 30, productions[1].feed * 100 / 30, productions[0].feed * 100 / 30],
+                    # 'textposition': 'auto',
+                    # 'hoverinfo': 'none',
+                    'name': 'Feed',
+                    'type': 'line'
+                };
+
+                value = json.dumps([trace1 ])
+
+
+
             # elif rec.variable_name == 'meg_sale':
             #     meg_sale = round(sum(meg_sale_list), 2)
             #     value = self.float_num(sum(meg_sale_list), 2)
@@ -204,17 +267,37 @@ class SdVisualizePetronadCalculate(models.Model):
 
         # return 'PETRONAD'
 
-    #     @api.onchange('update')
-    #     def update_compute(self):
-    #         for rec in self:
-    #             self._compute_values()
-    #         return super(KmDataPetronad, self).update_compute()
-    #
-    #     def _compute_values(self):
-    #         # todo: user might needed to have report based on time duration
-    #         productions = self.env['km_data.production'].search([('production_date', '>=' , date.today() - timedelta(days=60))])
-    #         meg_production = sum([rec.meg_production for rec in productions])
-    # #        todo: diagram id
+    def petronad_ethylene_weekly(self, diagram=0):
+        diagram = self.env['sd_visualize.diagram'].browse(diagram)
+        date_format = '%Y/%m/%d'
+        calendar = self.env.context.get('lang')
+        value_model = self.env['sd_visualize.values']
+
+        production = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),],order='production_date desc', limit=1,)
+        if len(production) == 0:
+            raise ValidationError(f'Production not found')
+
+        # finding tha last week
+        # the last record date:
+        this_date = production.production_date
+        last_friday = this_date + relativedelta(weekday=FR(-1))
+        week_saturday = last_friday + relativedelta(weekday=SA(-1))
+        # print(f'-----------> Date: \n {this_date} \n {last_friday} \n {week_saturday} \n')
+
+
+        productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),
+                                                                 ('production_date', '>=', week_saturday),
+                                                                 ('production_date', '<=', last_friday),]
+                                                                ,order='production_date desc', limit=1,)
+        if len(productions) == 0:
+            raise ValidationError(f'Production not found')
+        storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),('storage_date', '<=', productions[0].production_date)],order='id desc', limit=1,)
+        if  len(storages) == 0:
+            raise ValidationError(f'Storage not found')
+        tanks = self.env['km_petronad.tanks'].search([('project', '=', diagram.project.id),('tanks_date', '<=', productions[0].production_date)],order='id desc', limit=1,)
+        if  len(tanks) == 0:
+            raise ValidationError(f'Tank not found')
+        comments = self.env['km_petronad.comments'].search([('project', '=', diagram.project.id),('date', '=', productions[0].production_date)], order='sequence desc')
 
     def float_num(self, num, points):
         fnum = round(num, int(points))
