@@ -367,8 +367,8 @@ class SdVisualizePetronadCalculate(models.Model):
                 value = f'{self.convert_date(calendar, week_s_0)}-{self.convert_date(calendar, week_e_0)}'
             # Feed Purchased
             elif rec.variable_name == 'week_feed_purchased':
-                if len(feeds) > 0:
-                    value = self.float_num(sum(list([rec.feed_amount for rec in feeds])), 2)
+                if len(week_feeds) > 0:
+                    value = self.float_num(sum(list([rec.feed_amount for rec in week_feeds])), 2)
                 else:
                     value = 0
             # Feed Used
