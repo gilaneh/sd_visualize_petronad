@@ -31,14 +31,15 @@ class SdVisualizePetronadCalculate(models.Model):
         date_format = '%Y/%m/%d'
         calendar = self.env.context.get('lang')
         value_model = self.env['sd_visualize.values']
+        sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
 
         productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),],order='production_date desc', limit=3,)
         if len(productions) == 0:
             raise ValidationError(f'Production not found')
-        storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),('storage_date', '<=', productions[0].production_date)],order='id desc', limit=1,)
+        storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),('storage_date', '<=', productions[0].production_date)],order='storage_date desc', limit=1,)
         if  len(storages) == 0:
             raise ValidationError(f'Storage not found')
-        tanks = self.env['km_petronad.tanks'].search([('project', '=', diagram.project.id),('tanks_date', '<=', productions[0].production_date)],order='id desc', limit=1,)
+        tanks = self.env['km_petronad.tanks'].search([('project', '=', diagram.project.id),('tanks_date', '<=', productions[0].production_date)],order='tanks_date desc', limit=1,)
         if  len(tanks) == 0:
             raise ValidationError(f'Tank not found')
         comments = self.env['km_petronad.comments'].search([('project', '=', diagram.project.id),('date', '=', productions[0].production_date)], order='sequence desc')
@@ -60,7 +61,6 @@ class SdVisualizePetronadCalculate(models.Model):
             s_storage_date = storages.storage_date.strftime("%Y/%m/%d")
             # s_end_date = end_date.strftime("%Y/%m/%d")
 
-        sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
 
         results = []
         for rec in sorted_values:
@@ -167,7 +167,16 @@ class SdVisualizePetronadCalculate(models.Model):
                     'type': 'bar'
                 };
 
-                value = json.dumps([trace1, trace2, trace3])
+                plot_value = {
+                    'data': [trace1, trace2, trace3, ],
+                    'layout': {'autosize': False,
+                               'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'showlegend': True,
+                               'legend': {"orientation": "h"},
+                               'xaxis': {'fixedrange': True}, 'yaxis': {'fixedrange': True}, },
+                    'config': {'responsive': True, 'displayModeBar': False}
+                }
+                value = json.dumps(plot_value)
 
             elif rec.variable_name == 'chart_2':
                 trace1 = {
@@ -180,8 +189,16 @@ class SdVisualizePetronadCalculate(models.Model):
                     'type': 'line'
                 };
 
-                value = json.dumps([trace1 ])
-
+                plot_value = {
+                    'data': [trace1, ],
+                    'layout': {'autosize': False,
+                               'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'showlegend': True,
+                               'legend': {"orientation": "h"},
+                               'xaxis': {'fixedrange': True}, 'yaxis': {'fixedrange': True}, },
+                    'config': {'responsive': True, 'displayModeBar': False}
+                }
+                value = json.dumps(plot_value)
 
 
             # elif rec.variable_name == 'meg_sale':
@@ -272,25 +289,67 @@ class SdVisualizePetronadCalculate(models.Model):
         date_format = '%Y/%m/%d'
         calendar = self.env.context.get('lang')
         value_model = self.env['sd_visualize.values']
+        sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
+        week_production_plan = 126
 
         production = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),],order='production_date desc', limit=1,)
         if len(production) == 0:
             raise ValidationError(f'Production not found')
 
         # finding tha last week
-        # the last record date:
+        # week_e_x : friday
+        # week_s_x : saturday
         this_date = production.production_date
-        last_friday = this_date + relativedelta(weekday=FR(-1))
-        week_saturday = last_friday + relativedelta(weekday=SA(-1))
-        # print(f'-----------> Date: \n {this_date} \n {last_friday} \n {week_saturday} \n')
+        week_e_0 = this_date + relativedelta(weekday=FR(-1))
+        week_s_0 = week_e_0 + relativedelta(weekday=SA(-1))
+        week_e_1 = this_date + relativedelta(weekday=FR(-2))
+        week_s_1 = week_e_0 + relativedelta(weekday=SA(-2))
+        week_e_2 = this_date + relativedelta(weekday=FR(-3))
+        week_s_2 = week_e_0 + relativedelta(weekday=SA(-3))
+        week_e_3 = this_date + relativedelta(weekday=FR(-4))
+        week_s_3 = week_e_0 + relativedelta(weekday=SA(-4))
+        week_e_4 = this_date + relativedelta(weekday=FR(-5))
+        week_s_4 = week_e_0 + relativedelta(weekday=SA(-5))
+        week_e_5 = this_date + relativedelta(weekday=FR(-6))
+        week_s_5 = week_e_0 + relativedelta(weekday=SA(-6))
+        print(f'DDDDDDDDD>>> '
+              f'\n this_date: {this_date}'
+              f'\n week_s_0: {week_s_0}    week_e_0: {week_e_0}'
+              f'\n week_s_5: {week_s_5}    week_e_5: {week_e_5}'
+              f'')
 
 
         productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),
-                                                                 ('production_date', '>=', week_saturday),
-                                                                 ('production_date', '<=', last_friday),]
-                                                                ,order='production_date desc', limit=1,)
+                                                                 ('production_date', '>=', week_s_5),
+                                                                 ('production_date', '<=', week_e_0),]
+                                                                ,order='production_date desc', )
         if len(productions) == 0:
             raise ValidationError(f'Production not found')
+        week_production_0 = [rec for rec in productions if rec.production_date >= week_s_0 and rec.production_date <= week_e_0]
+        week_production_1 = [rec for rec in productions if rec.production_date >= week_s_1 and rec.production_date <= week_e_1]
+        week_production_2 = [rec for rec in productions if rec.production_date >= week_s_2 and rec.production_date <= week_e_2]
+        week_production_3 = [rec for rec in productions if rec.production_date >= week_s_3 and rec.production_date <= week_e_3]
+        week_production_4 = [rec for rec in productions if rec.production_date >= week_s_4 and rec.production_date <= week_e_4]
+        week_production_5 = [rec for rec in productions if rec.production_date >= week_s_5 and rec.production_date <= week_e_5]
+        week_sum_production_0 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_0]))
+        week_sum_production_1 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_1]))
+        week_sum_production_2 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_2]))
+        week_sum_production_3 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_3]))
+        week_sum_production_4 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_4]))
+        week_sum_production_5 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_5]))
+        week_feeds = self.env['km_petronad.feeds'].search([('project', '=', diagram.project.id),
+                                                                 ('feed_date', '>=', week_s_0),
+                                                                 ('feed_date', '<=', week_e_0),]
+                                                                ,order='feed_date desc', )
+        # if len(feeds) == 0:
+        #     raise ValidationError(f'Feeds not found')
+
         storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),('storage_date', '<=', productions[0].production_date)],order='id desc', limit=1,)
         if  len(storages) == 0:
             raise ValidationError(f'Storage not found')
@@ -299,7 +358,195 @@ class SdVisualizePetronadCalculate(models.Model):
             raise ValidationError(f'Tank not found')
         comments = self.env['km_petronad.comments'].search([('project', '=', diagram.project.id),('date', '=', productions[0].production_date)], order='sequence desc')
 
-    def float_num(self, num, points):
+
+        results = []
+        for rec in sorted_values:
+            if not rec.calculate:
+                continue
+            elif rec.variable_name == 'week_days':
+                value = f'{self.convert_date(calendar, week_s_0)}-{self.convert_date(calendar, week_e_0)}'
+            # Feed Purchased
+            elif rec.variable_name == 'week_feed_purchased':
+                if len(feeds) > 0:
+                    value = self.float_num(sum(list([rec.feed_amount for rec in feeds])), 2)
+                else:
+                    value = 0
+            # Feed Used
+
+            elif rec.variable_name == 'week_feed_used':
+                value = self.float_num(sum(list([rec.feed for rec in  productions])), 2)
+            # Production sum
+            elif rec.variable_name == 'week_production':
+
+                value = self.float_num(week_sum_production_0, 2)
+            # Sale sum
+            elif rec.variable_name == 'week_sale':
+                value = 'None'
+
+            elif rec.variable_name == 'chart_1':
+                week_sum_production_list = [week_sum_production_5,week_sum_production_4,week_sum_production_3,week_sum_production_2,week_sum_production_1,week_sum_production_0]
+                week_avr_production = self.float_num(sum(week_sum_production_list) / 6, 2)
+                performance_list = list(map(lambda x: self.float_num(x * 100 / week_production_plan, 0) if week_production_plan else 0, week_sum_production_list ))
+                print(f'sssssssssssssss>>>> performance_list: {performance_list}')
+                trace1 = {
+                    'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
+                    'y': [week_sum_production_5,week_sum_production_4,week_sum_production_3,week_sum_production_2,week_sum_production_1,week_sum_production_0],
+                    'text': [week_sum_production_5,week_sum_production_4,week_sum_production_3,week_sum_production_2,week_sum_production_1,week_sum_production_0],
+                    'name': 'Production',
+                    'type': 'bar',
+                    'marker': {
+                        'color': 'rgb(169,209,142)',
+                    },
+                };
+                trace2 = {
+                    'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
+                    'y': [week_production_plan, week_production_plan, week_production_plan, week_production_plan, week_production_plan, week_production_plan, ],
+                    'name': 'Plan',
+                    'mode': 'lines',
+                    'line': {
+                        'color': 'rgb(80,130,50)',
+                    },
+                };
+                trace3 = {
+                    'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
+                    'y': [week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,],
+                    'name': 'Average',
+                    'mode': 'lines',
+
+                    'line': {
+                        'dash': 'dot',
+                        'width': 2,
+                        'color': 'rgb(169,100,0)'
+                    }
+                };
+                trace4 = {
+                    'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
+                    'y': performance_list,
+                    'text': [1,2,3,4,5,6],
+                    'name': _('Efficiency'),
+                    'mode': 'lines',
+                    'yaxis': 'y2',
+
+                    'line': {
+                        'dash': 'dot',
+                        'width': 2,
+                        'color': 'rgb(90,150,210)'
+                    }
+                };
+                plot_value = {
+                    'data': [trace1, trace2, trace3, trace4, ],
+                    'layout': {'autosize': False,
+                               'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'showlegend': True,
+                               'legend': {"orientation": "h"},
+                               'xaxis': {'fixedrange': True},
+                               'yaxis': {
+                                   'title': _('Production(tone)'),
+                                   'fixedrange': True
+                               },
+                               'yaxis2': {
+                                   'overlaying': 'y',
+                                   'side': 'right',
+                                   'range': [0, 100],
+                                   'fixedrange': True,
+                                   'title': _('Efficiency(%)'),
+                               }
+                               },
+                    'config': {'responsive': True, 'displayModeBar': False}
+                }
+                value = json.dumps(plot_value)
+
+            elif rec.variable_name == 'chart_2':
+                trace1 = {
+                    'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
+                    'y': [200, 0, 0, 400, 0, 0],
+                    'name': 'Sale',
+                    'type': 'bar',
+                    'marker': {
+                        'color': 'rgb(70,110,200)',
+                    },
+                };
+                plot_value = {
+                    'data': [trace1,  ],
+                    'layout': {'autosize': False,
+                               'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'showlegend': True,
+                               'legend': {"orientation": "h"},
+                               'xaxis': {'fixedrange': True},
+                               'yaxis': {
+                                   'fixedrange': True
+                               },
+
+                               },
+                    'config': {'responsive': True, 'displayModeBar': False}
+                }
+
+
+                value = json.dumps(plot_value)
+            elif rec.variable_name == 'chart_3':
+                theta = [_('Sa'), _('Su'), _('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), ]
+                week_feeds
+                trace1 = {
+                          'type': 'scatterpolar',
+                          'r': [30, 30, 30, 30, 30, 30, 30, ],
+                          'theta': theta,
+                          # 'fill': 'toself',
+                          'name': 'Plan'
+                          }
+                trace2 = {
+                          'type': 'scatterpolar',
+                          'r': [25, 27, 25, 28, 24, 0, 30],
+                          'theta': theta,
+                          # 'fill': 'toself',
+                          'name': 'Feed'
+                          }
+                plot_value = {
+                    'data': [trace1, trace2,  ],
+                    'layout': {'autosize': False,
+                               'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'showlegend': True,
+                               'legend': {"orientation": "h"},
+                               'xaxis': {'fixedrange': True},
+                               'yaxis': {
+                                   'fixedrange': True
+                               },
+
+                               },
+                    'config': {'responsive': True, 'displayModeBar': False}
+                }
+
+
+                value = json.dumps(plot_value)
+
+
+            else:
+                continue
+
+            results.append((rec.id, value))
+
+        for rec in results:
+            value_model.browse(rec[0]).write({'value': rec[1]})
+
+        return {'name': 'arash'}
+
+
+    def float_num(self, num, points=2):
         fnum = round(num, int(points))
         frac = fnum - int(fnum)
         return str(int(fnum)) if frac == 0 else str(fnum)
+
+    def convert_date(self, lang='en_US', this_date=date.today()):
+        if lang == 'fa_IR':
+            # first_day = jdatetime.date.fromgregorian(date=end_date).replace(day=1)
+            # next_month = first_day.replace(day=28) + timedelta(days=5)
+            # last_day = (next_month - timedelta(days=next_month.day)).togregorian()
+            # first_day = first_day.togregorian
+            s_this_date = jdatetime.date.fromgregorian(date=this_date).strftime("%Y/%m/%d")
+        else:
+            # first_day = end_date.replace(day=1)
+            # next_month = first_day.replace(day=28) + timedelta(days=5)
+            # last_day = next_month - timedelta(days=next_month.day)
+
+            s_this_date = this_date.strftime("%Y/%m/%d")
+
+        return s_this_date
