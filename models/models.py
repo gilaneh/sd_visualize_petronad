@@ -153,19 +153,19 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': [productions[2].feed, productions[1].feed, productions[0].feed],
                     'name': 'Feed',
                     'type': 'bar'
-                };
+                }
                 trace2 = {
                     'x': ['Two days', 'day before', 'That day'],
                     'y': [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production],
                     'name': 'MEG',
                     'type': 'bar'
-                };
+                }
                 trace3 = {
                     'x': ['Two days', 'day before', 'That day'],
                     'y': [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production],
                     'name': 'H1',
                     'type': 'bar'
-                };
+                }
 
                 plot_value = {
                     'data': [trace1, trace2, trace3, ],
@@ -187,7 +187,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     # 'hoverinfo': 'none',
                     'name': 'Feed',
                     'type': 'line'
-                };
+                }
 
                 plot_value = {
                     'data': [trace1, ],
@@ -387,7 +387,7 @@ class SdVisualizePetronadCalculate(models.Model):
                 week_sum_production_list = [week_sum_production_5,week_sum_production_4,week_sum_production_3,week_sum_production_2,week_sum_production_1,week_sum_production_0]
                 week_avr_production = self.float_num(sum(week_sum_production_list) / 6, 2)
                 performance_list = list(map(lambda x: self.float_num(x * 100 / week_production_plan, 0) if week_production_plan else 0, week_sum_production_list ))
-                print(f'sssssssssssssss>>>> performance_list: {performance_list}')
+                # print(f'sssssssssssssss>>>> performance_list: {performance_list}')
                 trace1 = {
                     'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
                     'y': [week_sum_production_5,week_sum_production_4,week_sum_production_3,week_sum_production_2,week_sum_production_1,week_sum_production_0],
@@ -397,7 +397,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'marker': {
                         'color': 'rgb(169,209,142)',
                     },
-                };
+                }
                 trace2 = {
                     'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
                     'y': [week_production_plan, week_production_plan, week_production_plan, week_production_plan, week_production_plan, week_production_plan, ],
@@ -406,7 +406,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'line': {
                         'color': 'rgb(80,130,50)',
                     },
-                };
+                }
                 trace3 = {
                     'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
                     'y': [week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,],
@@ -418,7 +418,7 @@ class SdVisualizePetronadCalculate(models.Model):
                         'width': 2,
                         'color': 'rgb(169,100,0)'
                     }
-                };
+                }
                 trace4 = {
                     'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
                     'y': performance_list,
@@ -432,7 +432,7 @@ class SdVisualizePetronadCalculate(models.Model):
                         'width': 2,
                         'color': 'rgb(90,150,210)'
                     }
-                };
+                }
                 plot_value = {
                     'data': [trace1, trace2, trace3, trace4, ],
                     'layout': {'autosize': False,
@@ -458,14 +458,14 @@ class SdVisualizePetronadCalculate(models.Model):
 
             elif rec.variable_name == 'chart_2':
                 trace1 = {
-                    'x': ['5th', '4th', '3rd','2nd', '1st', 'This week'],
+                    'x': ['5th', '4th', '3rd', '2nd', '1st', 'This week'],
                     'y': [200, 0, 0, 400, 0, 0],
                     'name': 'Sale',
                     'type': 'bar',
                     'marker': {
                         'color': 'rgb(70,110,200)',
                     },
-                };
+                }
                 plot_value = {
                     'data': [trace1,  ],
                     'layout': {'autosize': False,
@@ -484,24 +484,34 @@ class SdVisualizePetronadCalculate(models.Model):
 
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_3':
-                theta = [_('Sa'), _('Su'), _('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), ]
+                theta = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه',]
                 week_feeds
                 trace1 = {
                           'type': 'scatterpolar',
                           'r': [30, 30, 30, 30, 30, 30, 30, ],
                           'theta': theta,
                           # 'fill': 'toself',
-                          'name': 'Plan'
+                          'name': 'Feed Plan'
                           }
                 trace2 = {
                           'type': 'scatterpolar',
                           'r': [25, 27, 25, 28, 24, 0, 30],
                           'theta': theta,
                           # 'fill': 'toself',
-                          'name': 'Feed'
+                          'name': 'Average',
+                          'line': {
+                                'dash': 'dash',
+                                },
+                          }
+                trace3 = {
+                          'type': 'scatterpolar',
+                          'r': [25, 27, 25, 28, 24, 0, 30],
+                          'theta': theta,
+                          # 'fill': 'toself',
+                          'name': 'Daily Feed'
                           }
                 plot_value = {
-                    'data': [trace1, trace2,  ],
+                    'data': [trace1, trace2, trace3,  ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'showlegend': True,
@@ -510,7 +520,25 @@ class SdVisualizePetronadCalculate(models.Model):
                                'yaxis': {
                                    'fixedrange': True
                                },
-
+                               'angularaxis': {
+                                   'direction': "clockwise",
+                                   'period': 6
+                               },
+                               'polar': {
+                                   'radialaxis': {
+                                       'angle': 90,
+                                       'textangle': 90,
+                                       'showgrid': False,
+                                       'showline': False,
+                                       'tickangle': 90,
+                                       'CanvasGradient': False,
+                                   },
+                                   'angularaxis': {
+                                       'direction': "clockwise",
+                                       'visible': True,
+                                       'linecolor': 'rgb(255,255,255,0)'
+                                   },
+                               },
                                },
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
