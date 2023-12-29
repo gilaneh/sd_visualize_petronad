@@ -13,6 +13,8 @@ class SdVisualizePetronadCalculate(models.Model):
 
     def calculate(self, function_name, diagram_id):
         res = super(SdVisualizePetronadCalculate, self).calculate(function_name, diagram_id)
+        # print(f'------>\n  Calculate: {self.env.context} diagram_id: {diagram_id}\n ')
+
         try:
             if function_name == 'petronad_ethylene_weekly':
                 res['value'] = self.petronad_ethylene_weekly(diagram_id)
@@ -26,6 +28,7 @@ class SdVisualizePetronadCalculate(models.Model):
 
     def petronad_ethylene_weekly(self, diagram=0):
         diagram = self.env['sd_visualize.diagram'].browse(diagram)
+        print(f'--------->\n    diagarm.select_date: {diagram.select_date}')
         date_format = '%Y/%m/%d'
         calendar = self.env.context.get('lang')
         value_model = self.env['sd_visualize.values']

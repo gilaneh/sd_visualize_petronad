@@ -38,7 +38,9 @@ class SdVisualizePetronadCalculateDaily(models.Model):
         tanks = self.env['km_petronad.tanks'].search([('project', '=', diagram.project.id),('tanks_date', '<=', productions[0].production_date)],order='tanks_date desc', limit=1,)
         if  len(tanks) == 0:
             raise ValidationError(f'Tank not found')
-        comments = self.env['km_petronad.comments'].search([('project', '=', diagram.project.id),('date', '=', productions[0].production_date)], order='sequence desc')
+        comments = self.env['km_petronad.comments'].search([('project', '=', diagram.project.id),
+                                                            ('date', '=', productions[0].production_date)],
+                                                           order='sequence')
 
         if calendar == 'fa_IR':
             # first_day = jdatetime.date.fromgregorian(date=end_date).replace(day=1)
@@ -138,7 +140,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             # Commnets
             elif rec.variable_name == 'comments':
                 if len(comments) > 0:
-                    value = '\n'.join(list([rec.comment for rec in comments]))
+                    value = ''.join(list([f'<p> {rec.comment}</p>' for rec in comments]))
+                    value = f'<div style="direction: rtl;">{value}</div>'
                 else:
                     value = ''
 
