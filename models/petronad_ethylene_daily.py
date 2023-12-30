@@ -8,6 +8,9 @@ from dateutil.rrule import *
 import jdatetime
 from odoo.exceptions import AccessError, ValidationError, MissingError, UserError
 import json
+import traceback
+
+
 class SdVisualizePetronadCalculateDaily(models.Model):
     _inherit = 'sd_visualize.calculate'
 
@@ -17,7 +20,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             if function_name == 'petronad_ethylene_daily':
                 res['value'] = self.petronad_ethylene_daily(diagram_id)
         except Exception as err:
-            logging.error(f'CALCULATION:{function_name}/ {err}')
+            logging.error(f'CALCULATION:{function_name}:\n{traceback.format_exc()}')
             raise ValidationError(f'CALCULATION:{function_name}/ {err}')
         return res
 
@@ -149,20 +152,26 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace1 = {
                     'x': ['Two days', 'day before', 'That day'],
                     'y': [productions[2].feed, productions[1].feed, productions[0].feed],
+                    'text': [productions[2].feed, productions[1].feed, productions[0].feed],
                     'name': 'Feed',
-                    'type': 'bar'
+                    'type': 'bar',
+                    'textposition': 'outside',
                 }
                 trace2 = {
                     'x': ['Two days', 'day before', 'That day'],
                     'y': [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production],
+                    'text': [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production],
                     'name': 'MEG',
-                    'type': 'bar'
+                    'type': 'bar',
+                    'textposition': 'outside',
                 }
                 trace3 = {
                     'x': ['Two days', 'day before', 'That day'],
                     'y': [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production],
+                    'text': [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production],
                     'name': 'H1',
-                    'type': 'bar'
+                    'type': 'bar',
+                    'textposition': 'outside',
                 }
 
                 plot_value = {
@@ -179,12 +188,13 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             elif rec.variable_name == 'chart_2':
                 trace1 = {
                     'x': ['Two days', 'day before', 'That day'],
-                    'y': [productions[2].feed * 100 / 30, productions[1].feed * 100 / 30, productions[0].feed * 100 / 30],
-                    # 'text': [productions[2].feed * 100 / 30, productions[1].feed * 100 / 30, productions[0].feed * 100 / 30],
+                    'y': [self.float_num(productions[2].feed * 100 / 30), self.float_num(productions[1].feed * 100 / 30), self.float_num(productions[0].feed * 100 / 30)],
+                    'text': [self.float_num(productions[2].feed * 100 / 30), self.float_num(productions[1].feed * 100 / 30), self.float_num(productions[0].feed * 100 / 30)],
                     # 'textposition': 'auto',
                     # 'hoverinfo': 'none',
                     'name': 'Feed',
-                    'type': 'line'
+                    'type': 'line',
+                            'textposition': 'top',
                 }
                 plot_value = {
                     'data': [trace1, ],
@@ -192,7 +202,9 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'showlegend': True,
                                'legend': {"orientation": "h"},
-                               'xaxis': {'fixedrange': True}, 'yaxis': {'fixedrange': True}, },
+                               'xaxis': {'fixedrange': True},
+                               'yaxis': {'fixedrange': True, 'range': [0, 110],},
+                               },
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)

@@ -8,6 +8,9 @@ from dateutil.rrule import *
 import jdatetime
 from odoo.exceptions import AccessError, ValidationError, MissingError, UserError
 import json
+import traceback
+
+
 class SdVisualizePetronadCalculate(models.Model):
     _inherit = 'sd_visualize.calculate'
 
@@ -16,124 +19,144 @@ class SdVisualizePetronadCalculate(models.Model):
         # print(f'------>\n  Calculate: {self.env.context} diagram_id: {diagram_id}\n ')
 
         try:
-            if function_name == 'petronad_ethylene_weekly':
-                res['value'] = self.petronad_ethylene_weekly(diagram_id)
+            if function_name == 'petronad_ethylene_monthly':
+                res['value'] = self.petronad_ethylene_monthly(diagram_id)
         #         todo: to prevent too many update requests, we can check some value write datetiem record.
         #           It seams that 10 seconds could be a good interval between two updates
         except Exception as err:
-            logging.error(f'CALCULATION:{function_name}/ {err}')
+            # logging.error(f'CALCULATION:{function_name}/ {err}')
+            logging.error(f'CALCULATION:{function_name}:\n{traceback.format_exc()}')
+
             raise ValidationError(f'CALCULATION:{function_name}/ {err}')
         return res
 
 
-    def petronad_ethylene_weekly(self, diagram=0):
+    def petronad_ethylene_monthly(self, diagram=0):
         diagram = self.env['sd_visualize.diagram'].browse(diagram)
-        print(f'--------->\n    diagarm.select_date: {diagram.select_date}')
+        print(f'--------->\n Monthly, diagarm.select_date: {diagram.select_date}')
         date_format = '%Y/%m/%d'
         calendar = self.env.context.get('lang')
         value_model = self.env['sd_visualize.values']
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
-        week_production_plan = 126
+        month_production_plan = 720
 
         production = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),]
                                                                , order='production_date desc', limit=1,)
         if len(production) == 0:
             raise ValidationError(f'Production not found')
 
-        # finding tha last week
-        # week_e_x : friday
-        # week_s_x : saturday
-        this_date = production.production_date
-        week_e_0 = this_date + relativedelta(weekday=FR(-1))
-        week_s_0 = week_e_0 + relativedelta(weekday=SA(-1))
-        week_e_1 = this_date + relativedelta(weekday=FR(-2))
-        week_s_1 = week_e_0 + relativedelta(weekday=SA(-2))
-        week_e_2 = this_date + relativedelta(weekday=FR(-3))
-        week_s_2 = week_e_0 + relativedelta(weekday=SA(-3))
-        week_e_3 = this_date + relativedelta(weekday=FR(-4))
-        week_s_3 = week_e_0 + relativedelta(weekday=SA(-4))
-        week_e_4 = this_date + relativedelta(weekday=FR(-5))
-        week_s_4 = week_e_0 + relativedelta(weekday=SA(-5))
-        week_e_5 = this_date + relativedelta(weekday=FR(-6))
-        week_s_5 = week_e_0 + relativedelta(weekday=SA(-6))
-        
+        this_date = date.today()
+        month_s_0, month_e_0 = self.month_start_end(this_date, 0, calendar)
+        month_s_1, month_e_1 = self.month_start_end(this_date, -1, calendar)
+        month_s_2, month_e_2 = self.month_start_end(this_date, -2, calendar)
+        month_s_3, month_e_3 = self.month_start_end(this_date, -3, calendar)
+        month_s_4, month_e_4 = self.month_start_end(this_date, -4, calendar)
+        month_s_5, month_e_5 = self.month_start_end(this_date, -5, calendar)
+
         # Production ##################################
         productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),
-                                                                 ('production_date', '>=', week_s_5),
-                                                                 ('production_date', '<=', week_e_0), ]
+                                                                 ('production_date', '>=', month_s_5),
+                                                                 ('production_date', '<=', month_e_0), ]
                                                                 ,order='production_date desc', )
+
         if len(productions) == 0:
             raise ValidationError(f'Production not found')
-        week_production_0 = [rec for rec in productions if rec.production_date >= week_s_0 and rec.production_date <= week_e_0]
-        week_production_1 = [rec for rec in productions if rec.production_date >= week_s_1 and rec.production_date <= week_e_1]
-        week_production_2 = [rec for rec in productions if rec.production_date >= week_s_2 and rec.production_date <= week_e_2]
-        week_production_3 = [rec for rec in productions if rec.production_date >= week_s_3 and rec.production_date <= week_e_3]
-        week_production_4 = [rec for rec in productions if rec.production_date >= week_s_4 and rec.production_date <= week_e_4]
-        week_production_5 = [rec for rec in productions if rec.production_date >= week_s_5 and rec.production_date <= week_e_5]
-        week_sum_production_0 = sum(
-            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_0]))
-        week_sum_production_1 = sum(
-            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_1]))
-        week_sum_production_2 = sum(
-            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_2]))
-        week_sum_production_3 = sum(
-            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_3]))
-        week_sum_production_4 = sum(
-            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_4]))
-        week_sum_production_5 = sum(
-            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in week_production_5]))
+        month_production_0 = [rec for rec in productions if rec.production_date >= month_s_0 and rec.production_date <= month_e_0]
+        month_production_1 = [rec for rec in productions if rec.production_date >= month_s_1 and rec.production_date <= month_e_1]
+        month_production_2 = [rec for rec in productions if rec.production_date >= month_s_2 and rec.production_date <= month_e_2]
+        month_production_3 = [rec for rec in productions if rec.production_date >= month_s_3 and rec.production_date <= month_e_3]
+        month_production_4 = [rec for rec in productions if rec.production_date >= month_s_4 and rec.production_date <= month_e_4]
+        month_production_5 = [rec for rec in productions if rec.production_date >= month_s_5 and rec.production_date <= month_e_5]
+        
+        month_sum_production_0 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in month_production_0]))
+        month_sum_production_1 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in month_production_1]))
+        month_sum_production_2 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in month_production_2]))
+        month_sum_production_3 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in month_production_3]))
+        month_sum_production_4 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in month_production_4]))
+        month_sum_production_5 = sum(
+            list([rec.meg_production + rec.deg_production + rec.teg_production for rec in month_production_5]))
         
         # Sale ##################################
-        week_sales = self.env['km_petronad.sale'].search([('project', '=', diagram.project.id),
-                                                     ('sale_date', '>=', week_s_0),
-                                                     ('sale_date', '<=', week_e_0)],
+        month_sales = self.env['km_petronad.sale'].search([('project', '=', diagram.project.id),
+                                                     ('sale_date', '>=', month_s_0),
+                                                     ('sale_date', '<=', month_e_0)],
                                                     order='sale_date desc', )
-        print(f'==========> week_sales: {week_sales}')
+        print(f'==========> month_sales: {month_sales}')
 
         sales = self.env['km_petronad.sale'].search([('project', '=', diagram.project.id),
-                                                     ('sale_date', '>=', week_s_5),
-                                                     ('sale_date', '<=', week_e_0)],
+                                                     ('sale_date', '>=', month_s_5),
+                                                     ('sale_date', '<=', month_e_0)],
                                                     order='sale_date desc', )
         if len(sales) > 0:
-            week_sale_0 = [rec for rec in sales if
-                                 rec.sale_date >= week_s_0 and rec.sale_date <= week_e_0]
-            week_sale_1 = [rec for rec in sales if
-                                 rec.sale_date >= week_s_1 and rec.sale_date <= week_e_1]
-            week_sale_2 = [rec for rec in sales if
-                                 rec.sale_date >= week_s_2 and rec.sale_date <= week_e_2]
-            week_sale_3 = [rec for rec in sales if
-                                 rec.sale_date >= week_s_3 and rec.sale_date <= week_e_3]
-            week_sale_4 = [rec for rec in sales if
-                                 rec.sale_date >= week_s_4 and rec.sale_date <= week_e_4]
-            week_sale_5 = [rec for rec in sales if
-                                 rec.sale_date >= week_s_5 and rec.sale_date <= week_e_5]
-            week_sum_sale_0 = sum(
-                list([rec.amount for rec in week_sale_0]))
-            week_sum_sale_1 = sum(
-                list([rec.amount for rec in week_sale_1]))
-            week_sum_sale_2 = sum(
-                list([rec.amount for rec in week_sale_2]))
-            week_sum_sale_3 = sum(
-                list([rec.amount for rec in week_sale_3]))
-            week_sum_sale_4 = sum(
-                list([rec.amount for rec in week_sale_4]))
-            week_sum_sale_5 = sum(
-                list([rec.amount for rec in week_sale_5]))
+            # self.records_list(sales, month_s_0, month_e_0)
+            # month_sale_0 = [rec for rec in sales if
+            #                      rec.sale_date >= month_s_0 and rec.sale_date <= month_e_0]
+            # month_sale_1 = [rec for rec in sales if
+            #                      rec.sale_date >= month_s_1 and rec.sale_date <= month_e_1]
+            # month_sale_2 = [rec for rec in sales if
+            #                      rec.sale_date >= month_s_2 and rec.sale_date <= month_e_2]
+            # month_sale_3 = [rec for rec in sales if
+            #                      rec.sale_date >= month_s_3 and rec.sale_date <= month_e_3]
+            # month_sale_4 = [rec for rec in sales if
+            #                      rec.sale_date >= month_s_4 and rec.sale_date <= month_e_4]
+            # month_sale_5 = [rec for rec in sales if
+            #                      rec.sale_date >= month_s_5 and rec.sale_date <= month_e_5]
+            month_sale_0 = self.records_list(sales, 'sale_date', month_s_0, month_e_0)
+            month_sale_1 = self.records_list(sales, 'sale_date',month_s_1, month_e_1)
+            month_sale_2 = self.records_list(sales, 'sale_date',month_s_2, month_e_2)
+            month_sale_3 = self.records_list(sales, 'sale_date',month_s_3, month_e_3)
+            month_sale_4 = self.records_list(sales, 'sale_date',month_s_4, month_e_4)
+            month_sale_5 = self.records_list(sales, 'sale_date',month_s_5, month_e_5)
+
+            month_sum_sale_0 = sum(list([rec.amount for rec in month_sale_0]))
+            month_sum_sale_1 = sum(list([rec.amount for rec in month_sale_1]))
+            month_sum_sale_2 = sum(list([rec.amount for rec in month_sale_2]))
+            month_sum_sale_3 = sum(list([rec.amount for rec in month_sale_3]))
+            month_sum_sale_4 = sum(list([rec.amount for rec in month_sale_4]))
+            month_sum_sale_5 = sum(list([rec.amount for rec in month_sale_5]))
         
         # Feeds ##################################
-        week_feeds = self.env['km_petronad.feeds'].search([('project', '=', diagram.project.id),
-                                                     ('feed_date', '>=', week_s_0),
-                                                     ('feed_date', '<=', week_e_0)],
+        month_feeds = self.env['km_petronad.feeds'].search([('project', '=', diagram.project.id),
+                                                     ('feed_date', '>=', month_s_0),
+                                                     ('feed_date', '<=', month_e_0)],
                                                     order='feed_date desc', )
         # Storages ##################################
         storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),
-                                                           ('storage_date', '<=', productions[0].production_date)],
+                                                           ('storage_date', '<=', month_e_0)],
                                                           order='storage_date desc', limit=1,)
 
         # Tanks ##################################
         tanks = self.env['km_petronad.tanks'].search([('project', '=', diagram.project.id),
                                                       ('tanks_date', '<=', productions[0].production_date)],
                                                      order='tanks_date desc', limit=1,)
+        # Tanks ##################################
+        shutdowns = self.env['km_petronad.shutdown'].search([('project', '=', diagram.project.id),
+                                                            ('shutdown_date', '>=', month_s_5),
+                                                            ('shutdown_date', '<=', month_e_0)],
+                                                           order='shutdown_date desc', )
+        month_shutdown_0 = self.records_list(shutdowns, 'shutdown_date', month_s_0, month_e_0)
+        month_shutdown_1 = self.records_list(shutdowns, 'shutdown_date', month_s_1, month_e_1)
+        month_shutdown_2 = self.records_list(shutdowns, 'shutdown_date', month_s_2, month_e_2)
+        month_sum_shutdown_0 = sum(list([rec.shutdown_time for rec in month_shutdown_0]))
+        month_sum_shutdown_1 = sum(list([rec.shutdown_time for rec in month_shutdown_1]))
+        month_sum_shutdown_2 = sum(list([rec.shutdown_time for rec in month_shutdown_2]))
+
+        shutdown_types = list([(str(rec.shutdown_type.name), rec.shutdown_time) for rec in month_shutdown_0])
+
+
+
+        print(f'''
+            
+          shutdown_types:
+            {shutdown_types}
+        
+        ''')
+
 
 
 
@@ -142,66 +165,79 @@ class SdVisualizePetronadCalculate(models.Model):
         for rec in sorted_values:
             if not rec.calculate:
                 continue
-            elif rec.variable_name == 'week_days':
-                value = f'{self.convert_date(calendar, week_e_0)}  -  {self.convert_date(calendar, week_s_0)}'
-            elif rec.variable_name == 'week_feed_purchased':
-                # Feed Purchased
-                if len(week_feeds) > 0:
-                    value = self.float_num(sum(list([rec.feed_amount for rec in week_feeds])), 2)
+            elif rec.variable_name == 'report_date':
+                value = f'{self.convert_date(calendar, month_e_0)}  -  {self.convert_date(calendar, month_s_0)}'
+
+            elif rec.variable_name == 'production_plan':
+                value = month_production_plan
+
+            elif rec.variable_name == 'month_production':
+                value = self.float_num(month_sum_production_0, 2)
+
+            elif rec.variable_name == 'month_sale':
+            # Sale sum
+                if len(month_sales) > 0:
+                    value = self.float_num(sum(list([rec.amount for rec in month_sales])), 2)
                 else:
                     value = 0
-            elif rec.variable_name == 'week_feed_used':
-                # Feed Used
-                value = self.float_num(sum(list([rec.feed for rec in  productions])), 2)
-            elif rec.variable_name == 'week_production':
-                # Production sum
-                value = self.float_num(week_sum_production_0, 2)
-            elif rec.variable_name == 'week_sale':
+            elif rec.variable_name == 'stock_production':
             # Sale sum
-                if len(week_sales) > 0:
-                    value = self.float_num(sum(list([rec.amount for rec in week_sales])), 2)
+                if len(storages) > 0:
+                    value = self.float_num(sum(list([rec.meg_storage + rec.deg_storage + rec.teg_storage for rec in storages])), 2)
                 else:
                     value = 0
             elif rec.variable_name == 'chart_1':
-                six_weeks = ['پنجم', 'چهارم', 'سوم', 'دوم', 'هفته پیش', 'هفته جاری',]
-                week_sum_production_list = [week_sum_production_5,week_sum_production_4,week_sum_production_3,week_sum_production_2,week_sum_production_1,week_sum_production_0]
-                week_avr_production = self.float_num(sum(week_sum_production_list) / 6, 2)
-                performance_list = list(map(lambda x: self.float_num(x * 100 / week_production_plan, 0) if week_production_plan else 0, week_sum_production_list ))
+                three_months = ['دوم', 'ماه پیش', 'ماه جاری',]
+                month_sum_production_list = [month_sum_production_2,month_sum_production_1,month_sum_production_0]
+                # month_avr_production = self.float_num(sum(month_sum_production_list) / 6, 2)
+                # performance_list = list(map(lambda x: self.float_num(x * 100 / month_production_plan, 0) if month_production_plan else 0, month_sum_production_list ))
                 trace1 = {
-                    'x': six_weeks,
-                    'y': [week_sum_production_5,week_sum_production_4,week_sum_production_3,week_sum_production_2,week_sum_production_1,week_sum_production_0],
-                    'text': [week_sum_production_5,week_sum_production_4,week_sum_production_3,week_sum_production_2,week_sum_production_1,week_sum_production_0],
-                    'name': 'Production',
+                    'x': three_months,
+                    'y': [720 - month_sum_shutdown_2, 720- month_sum_shutdown_1, 720 - month_sum_shutdown_0],
+                    'text': [720 - month_sum_shutdown_2, 720- month_sum_shutdown_1, 720 - month_sum_shutdown_0],
+                    'name': 'Working',
                     'type': 'bar',
                     'marker': {
-                        'color': 'rgb(169,209,142)',
+                        'color': 'rgb(180,200,230)',
+                    },
+                    'textposition': 'inside',
+
+                }
+                trace2 = {
+                    'x': three_months,
+                    'y': [month_sum_shutdown_2, month_sum_shutdown_1, month_sum_shutdown_0],
+                    'text': [month_sum_shutdown_2, month_sum_shutdown_1, month_sum_shutdown_0],
+                    'name': 'Shutdown',
+                    'type': 'bar',
+                    'marker': {
+                        'color': 'rgb(80,80,80)',
                     },
                     'textposition': 'outside',
 
                 }
-                trace2 = {
-                    'x': six_weeks,
-                    'y': [week_production_plan, week_production_plan, week_production_plan, week_production_plan, week_production_plan, week_production_plan, ],
-                    'name': 'Plan',
-                    'mode': 'lines',
-                    'line': {
-                        'color': 'rgb(80,130,50)',
-                    },
-                }
-                trace3 = {
-                    'x': six_weeks,
-                    'y': [week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,week_avr_production,],
-                    'name': 'Average',
-                    'mode': 'lines',
-
-                    'line': {
-                        'dash': 'dash',
-                        'width': 2,
-                        'color': 'rgb(80,130,50)',
-                    }
-                }
+                # trace2 = {
+                #     'x': three_months,
+                #     'y': [month_production_plan, month_production_plan, month_production_plan, ],
+                #     'name': 'Plan',
+                #     'mode': 'lines',
+                #     'line': {
+                #         'color': 'rgb(80,130,50)',
+                #     },
+                # }
+                # trace3 = {
+                #     'x': three_months,
+                #     'y': [month_avr_production,month_avr_production,month_avr_production,month_avr_production,month_avr_production,month_avr_production,month_avr_production,],
+                #     'name': 'Average',
+                #     'mode': 'lines',
+                #
+                #     'line': {
+                #         'dash': 'dash',
+                #         'width': 2,
+                #         'color': 'rgb(80,130,50)',
+                #     }
+                # }
                 # trace4 = {
-                #     'x': six_weeks,
+                #     'x': six_months,
                 #     'y': performance_list,
                 #     'text': [1,2,3,4,5,6],
                 #     'name': _('Efficiency'),
@@ -215,16 +251,17 @@ class SdVisualizePetronadCalculate(models.Model):
                 #     }
                 # }
                 plot_value = {
-                    'data': [trace1, trace2, trace3, ],
+                    'data': [trace1, trace2, ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'showlegend': True,
                                'legend': {"orientation": "h"},
+                               'barmode': 'stack',
                                'xaxis': {'fixedrange': True},
                                'yaxis': {
                                    'title': _('Production(tone)'),
                                    'fixedrange': True,
-                                   'range': [0, week_production_plan * 1.2],
+                                   'range': [0, month_production_plan * 1.2],
 
                                },
                                'yaxis2': {
@@ -239,14 +276,14 @@ class SdVisualizePetronadCalculate(models.Model):
                 }
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_2':
-                six_weeks = ['پنجم', 'چهارم', 'سوم', 'دوم', 'هفته پیش', 'هفته جاری',]
-                week_sum_sale_list = [week_sum_sale_5,week_sum_sale_4,week_sum_sale_3,week_sum_sale_2,week_sum_sale_1,week_sum_sale_0]
-                week_avr_sale = self.float_num(sum(week_sum_sale_list) / 6, 2)
+                six_months = ['پنجم', 'چهارم', 'سوم', 'دوم', 'هفته پیش', 'هفته جاری',]
+                month_sum_sale_list = [month_sum_sale_5,month_sum_sale_4,month_sum_sale_3,month_sum_sale_2,month_sum_sale_1,month_sum_sale_0]
+                month_avr_sale = self.float_num(sum(month_sum_sale_list) / 6, 2)
 
                 trace1 = {
-                    'x': six_weeks,
-                    'y': [week_sum_sale_5,week_sum_sale_4,week_sum_sale_3,week_sum_sale_2,week_sum_sale_1,week_sum_sale_0],
-                    'text': [week_sum_sale_5,week_sum_sale_4,week_sum_sale_3,week_sum_sale_2,week_sum_sale_1,week_sum_sale_0],
+                    'x': six_months,
+                    'y': [month_sum_sale_5,month_sum_sale_4,month_sum_sale_3,month_sum_sale_2,month_sum_sale_1,month_sum_sale_0],
+                    'text': [month_sum_sale_5,month_sum_sale_4,month_sum_sale_3,month_sum_sale_2,month_sum_sale_1,month_sum_sale_0],
                     'name': 'sale',
                     'type': 'bar',
                     'marker': {
@@ -258,8 +295,8 @@ class SdVisualizePetronadCalculate(models.Model):
                 }
 
                 trace2 = {
-                    'x': six_weeks,
-                    'y': [week_avr_sale,week_avr_sale,week_avr_sale,week_avr_sale,week_avr_sale,week_avr_sale,week_avr_sale,],
+                    'x': six_months,
+                    'y': [month_avr_sale,month_avr_sale,month_avr_sale,month_avr_sale,month_avr_sale,month_avr_sale,month_avr_sale,],
                     'name': 'Average',
                     'mode': 'lines',
 
@@ -280,7 +317,7 @@ class SdVisualizePetronadCalculate(models.Model):
                                'yaxis': {
                                    'title': _('sale(tone)'),
                                    'fixedrange': True,
-                                   'range': [0, max(week_sum_sale_list) * 1.2],
+                                   'range': [0, max(month_sum_sale_list) * 1.2],
 
                                },
                                'yaxis2': {
@@ -296,8 +333,8 @@ class SdVisualizePetronadCalculate(models.Model):
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_3':
                 theta = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه',]
-                week_production_0_list = self.create_weekly_list(week_production_0, calendar)
-                trace2_r = list([rec.feed if rec else 0 for rec in week_production_0_list ])
+                month_production_0_list = self.create_monthly_list(month_production_0, calendar)
+                trace2_r = list([rec.feed if rec else 0 for rec in month_production_0_list ])
                 tr_avr = sum(trace2_r) / 7
                 trace2_avr = []
                 [trace2_avr.append(tr_avr) for rec in  range(7)]
@@ -369,8 +406,8 @@ class SdVisualizePetronadCalculate(models.Model):
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_4':
                 theta = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه',]
-                week_production_0_list = self.create_weekly_list(week_production_0, calendar)
-                trace2_r = list([rec.meg_production + rec.deg_production + rec.teg_production  if rec else 0 for rec in week_production_0_list ])
+                month_production_0_list = self.create_monthly_list(month_production_0, calendar)
+                trace2_r = list([rec.meg_production + rec.deg_production + rec.teg_production  if rec else 0 for rec in month_production_0_list ])
                 tr_avr = sum(trace2_r) / 7
                 trace2_avr = []
                 [trace2_avr.append(tr_avr) for rec in  range(7)]
@@ -441,10 +478,10 @@ class SdVisualizePetronadCalculate(models.Model):
                 }
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_5':
-                week_production_0_list = self.create_weekly_list(week_production_0, calendar)
-                meg_production = sum(list([rec.meg_production if rec else 0 for rec in week_production_0_list ]))
-                deg_production = sum(list([rec.deg_production if rec else 0 for rec in week_production_0_list ]))
-                teg_production = sum(list([rec.teg_production if rec else 0 for rec in week_production_0_list ]))
+                month_production_0_list = self.create_monthly_list(month_production_0, calendar)
+                meg_production = sum(list([rec.meg_production if rec else 0 for rec in month_production_0_list ]))
+                deg_production = sum(list([rec.deg_production if rec else 0 for rec in month_production_0_list ]))
+                teg_production = sum(list([rec.teg_production if rec else 0 for rec in month_production_0_list ]))
                 tr_avr = sum(trace2_r) / 7
                 trace2_avr = []
                 [trace2_avr.append(tr_avr) for rec in  range(7)]
@@ -552,11 +589,14 @@ class SdVisualizePetronadCalculate(models.Model):
 
 
 
-    def create_weekly_list(self, records, lang):
+    def create_monthly_list(self, records, lang):
         new_record_list = [0, 0, 0, 0, 0, 0, 0, ]
-        week_days = [5, 6, 0, 1, 2, 3, 4, ]
+        month_days = [5, 6, 0, 1, 2, 3, 4, ]
         for rec in records:
-            index = week_days.index(rec.production_date.weekday())
+            index = month_days.index(rec.production_date.monthday())
             new_record_list[index] = rec
         return new_record_list
 
+
+    def records_list(self, records, date_name, start_date, end_date):
+        return list([rec for rec in records if rec[f'{date_name}'] >= start_date and rec[f'{date_name}'] <= end_date])

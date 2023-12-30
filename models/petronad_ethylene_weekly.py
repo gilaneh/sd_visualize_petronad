@@ -8,6 +8,9 @@ from dateutil.rrule import *
 import jdatetime
 from odoo.exceptions import AccessError, ValidationError, MissingError, UserError
 import json
+import traceback
+
+
 class SdVisualizePetronadCalculate(models.Model):
     _inherit = 'sd_visualize.calculate'
 
@@ -21,7 +24,7 @@ class SdVisualizePetronadCalculate(models.Model):
         #         todo: to prevent too many update requests, we can check some value write datetiem record.
         #           It seams that 10 seconds could be a good interval between two updates
         except Exception as err:
-            logging.error(f'CALCULATION:{function_name}/ {err}')
+            logging.error(f'CALCULATION:{function_name}:\n{traceback.format_exc()}')
             raise ValidationError(f'CALCULATION:{function_name}/ {err}')
         return res
 
