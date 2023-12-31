@@ -14,13 +14,13 @@ import traceback
 class SdVisualizePetronadCalculate(models.Model):
     _inherit = 'sd_visualize.calculate'
 
-    def calculate(self, function_name, diagram_id):
-        res = super(SdVisualizePetronadCalculate, self).calculate(function_name, diagram_id)
+    def calculate(self, function_name, diagram_id, update_date):
+        res = super(SdVisualizePetronadCalculate, self).calculate(function_name, diagram_id, update_date)
         # print(f'------>\n  Calculate: {self.env.context} diagram_id: {diagram_id}\n ')
 
         try:
             if function_name == 'petronad_ethylene_monthly':
-                res['value'] = self.petronad_ethylene_monthly(diagram_id)
+                res['value'] = self.petronad_ethylene_monthly(diagram_id, update_date)
         #         todo: to prevent too many update requests, we can check some value write datetiem record.
         #           It seams that 10 seconds could be a good interval between two updates
         except Exception as err:
@@ -31,7 +31,7 @@ class SdVisualizePetronadCalculate(models.Model):
         return res
 
 
-    def petronad_ethylene_monthly(self, diagram=0):
+    def petronad_ethylene_monthly(self, diagram=0, update_date=0):
         diagram = self.env['sd_visualize.diagram'].browse(diagram)
         print(f'--------->\n Monthly, diagarm.select_date: {diagram.select_date}')
         date_format = '%Y/%m/%d'

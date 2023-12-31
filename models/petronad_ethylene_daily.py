@@ -14,25 +14,32 @@ import traceback
 class SdVisualizePetronadCalculateDaily(models.Model):
     _inherit = 'sd_visualize.calculate'
 
-    def calculate(self, function_name, diagram_id):
-        res = super(SdVisualizePetronadCalculateDaily, self).calculate(function_name, diagram_id)
+    def calculate(self, function_name, diagram_id, update_date):
+        res = super(SdVisualizePetronadCalculateDaily, self).calculate(function_name, diagram_id, update_date)
         try:
             if function_name == 'petronad_ethylene_daily':
-                res['value'] = self.petronad_ethylene_daily(diagram_id)
+                res['value'] = self.petronad_ethylene_daily(diagram_id, update_date)
         except Exception as err:
             logging.error(f'CALCULATION:{function_name}:\n{traceback.format_exc()}')
             raise ValidationError(f'CALCULATION:{function_name}/ {err}')
         return res
 
 
-    def petronad_ethylene_daily(self, diagram=0, start_date=date.today() - timedelta(days=30), end_date=date.today()):
+    def petronad_ethylene_daily(self, diagram=0, update_date=0):
         diagram = self.env['sd_visualize.diagram'].browse(diagram)
         date_format = '%Y/%m/%d'
         calendar = self.env.context.get('lang')
         value_model = self.env['sd_visualize.values']
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
 
-        productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),],order='production_date desc', limit=3,)
+        report_date = date.fromisoformat(update_date)
+        print(f'''
+    {update_date} {report_date}
+''')
+
+        productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),
+                                                                 ('production_date', '<=', report_date),
+                                                                 ],order='production_date desc', limit=3,)
         if len(productions) == 0:
             raise ValidationError(f'Production not found')
         storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),('storage_date', '<=', productions[0].production_date)],order='storage_date desc', limit=1,)
