@@ -146,7 +146,13 @@ class SdVisualizePetronadCalculate(models.Model):
         month_sum_shutdown_1 = sum(list([rec.shutdown_time for rec in month_shutdown_1]))
         month_sum_shutdown_2 = sum(list([rec.shutdown_time for rec in month_shutdown_2]))
 
-        shutdown_types = list([(str(rec.shutdown_type.name), rec.shutdown_time) for rec in month_shutdown_0])
+        shutdown_types_list = list([(str(rec.shutdown_type.name), rec.shutdown_time) for rec in month_shutdown_0])
+        shutdown_types = list([rec[0] for rec in shutdown_types_list])
+        shutdown_types_sum = {}
+        for type_rec in shutdown_types:
+            shutdown_types_sum[type_rec] = sum(list([rec[1] for rec in shutdown_types_list if rec[0] == type_rec]))
+
+
 
 
 
@@ -154,6 +160,8 @@ class SdVisualizePetronadCalculate(models.Model):
             
           shutdown_types:
             {shutdown_types}
+            {shutdown_types}
+            {shutdown_types_sum}
         
         ''')
 
@@ -215,41 +223,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'textposition': 'outside',
 
                 }
-                # trace2 = {
-                #     'x': three_months,
-                #     'y': [month_production_plan, month_production_plan, month_production_plan, ],
-                #     'name': 'Plan',
-                #     'mode': 'lines',
-                #     'line': {
-                #         'color': 'rgb(80,130,50)',
-                #     },
-                # }
-                # trace3 = {
-                #     'x': three_months,
-                #     'y': [month_avr_production,month_avr_production,month_avr_production,month_avr_production,month_avr_production,month_avr_production,month_avr_production,],
-                #     'name': 'Average',
-                #     'mode': 'lines',
-                #
-                #     'line': {
-                #         'dash': 'dash',
-                #         'width': 2,
-                #         'color': 'rgb(80,130,50)',
-                #     }
-                # }
-                # trace4 = {
-                #     'x': six_months,
-                #     'y': performance_list,
-                #     'text': [1,2,3,4,5,6],
-                #     'name': _('Efficiency'),
-                #     'mode': 'lines',
-                #     'yaxis': 'y2',
-                #
-                #     'line': {
-                #         'dash': 'dot',
-                #         'width': 2,
-                #         'color': 'rgb(90,150,210)'
-                #     }
-                # }
+
                 plot_value = {
                     'data': [trace1, trace2, ],
                     'layout': {'autosize': False,
@@ -257,6 +231,7 @@ class SdVisualizePetronadCalculate(models.Model):
                                'showlegend': True,
                                'legend': {"orientation": "h"},
                                'barmode': 'stack',
+                               'bargap' : 0.01, 'bargroupgap' : 0.0,
                                'xaxis': {'fixedrange': True},
                                'yaxis': {
                                    'title': _('Production(tone)'),
@@ -275,62 +250,55 @@ class SdVisualizePetronadCalculate(models.Model):
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
+
             elif rec.variable_name == 'chart_2':
                 six_months = ['پنجم', 'چهارم', 'سوم', 'دوم', 'هفته پیش', 'هفته جاری',]
                 month_sum_sale_list = [month_sum_sale_5,month_sum_sale_4,month_sum_sale_3,month_sum_sale_2,month_sum_sale_1,month_sum_sale_0]
                 month_avr_sale = self.float_num(sum(month_sum_sale_list) / 6, 2)
 
                 trace1 = {
-                    'x': six_months,
-                    'y': [month_sum_sale_5,month_sum_sale_4,month_sum_sale_3,month_sum_sale_2,month_sum_sale_1,month_sum_sale_0],
-                    'text': [month_sum_sale_5,month_sum_sale_4,month_sum_sale_3,month_sum_sale_2,month_sum_sale_1,month_sum_sale_0],
-                    'name': 'sale',
-                    'type': 'bar',
-                    'marker': {
-                        'color': 'rgb(100,160,200)',
-                    },
-                    'textposition': 'outside',
-                    'textcolor': 'black',
-
-                }
-
-                trace2 = {
-                    'x': six_months,
-                    'y': [month_avr_sale,month_avr_sale,month_avr_sale,month_avr_sale,month_avr_sale,month_avr_sale,month_avr_sale,],
-                    'name': 'Average',
-                    'mode': 'lines',
-
-                    'line': {
-                        'dash': 'dash',
-                        'width': 2,
-                        'color': 'rgb(30,70,100)',
-                    }
-                }
+                          'type': 'pie',
+                          'values': list(shutdown_types_sum.values()),
+                          'labels': list(shutdown_types_sum.keys()),
+                          'textinfo': 'label+value',
+                          'textposition': 'outside',
+                            'showlegend': False,
+                          }
 
                 plot_value = {
-                    'data': [trace1, trace2,  ],
+                    'data': [trace1,   ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'showlegend': True,
                                'legend': {"orientation": "h"},
                                'xaxis': {'fixedrange': True},
                                'yaxis': {
-                                   'title': _('sale(tone)'),
-                                   'fixedrange': True,
-                                   'range': [0, max(month_sum_sale_list) * 1.2],
-
+                                   'fixedrange': True
                                },
-                               'yaxis2': {
-                                   'overlaying': 'y',
-                                   'side': 'right',
-                                   'range': [0, 100],
-                                   'fixedrange': True,
-                                   'title': _('Efficiency(%)'),
-                               }
+                               'angularaxis': {
+                                   'direction': "clockwise",
+                                   'period': 6
+                               },
+                               'polar': {
+                                   'radialaxis': {
+                                       'angle': 90,
+                                       'textangle': 90,
+                                       'showgrid': False,
+                                       'showline': False,
+                                       'tickangle': 90,
+                                       'CanvasGradient': False,
+                                   },
+                                   'angularaxis': {
+                                       'direction': "clockwise",
+                                       'visible': True,
+                                       'linecolor': 'rgb(255,255,255,0)'
+                                   },
+                               },
                                },
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
+
             elif rec.variable_name == 'chart_3':
                 theta = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه',]
                 month_production_0_list = self.create_monthly_list(month_production_0, calendar)
@@ -404,6 +372,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
+
             elif rec.variable_name == 'chart_4':
                 theta = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه',]
                 month_production_0_list = self.create_monthly_list(month_production_0, calendar)

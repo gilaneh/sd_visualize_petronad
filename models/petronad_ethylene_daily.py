@@ -149,26 +149,35 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     value = ''
 
             elif rec.variable_name == 'chart_1':
+                trace1_y = [productions[2].feed, productions[1].feed, productions[0].feed]
+                trace2_y = [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production]
+                trace3_y = [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production]
+                yrange = int(max(trace1_y + trace2_y + trace3_y) * 1.5)
+                print(f'''
+
+            yrange: {yrange}
+
+''')
                 trace1 = {
                     'x': ['Two days', 'day before', 'That day'],
-                    'y': [productions[2].feed, productions[1].feed, productions[0].feed],
-                    'text': [productions[2].feed, productions[1].feed, productions[0].feed],
+                    'y': trace1_y,
+                    'text': trace1_y,
                     'name': 'Feed',
                     'type': 'bar',
                     'textposition': 'outside',
                 }
                 trace2 = {
                     'x': ['Two days', 'day before', 'That day'],
-                    'y': [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production],
-                    'text': [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production],
+                    'y': trace2_y,
+                    'text': trace2_y,
                     'name': 'MEG',
                     'type': 'bar',
                     'textposition': 'outside',
                 }
                 trace3 = {
                     'x': ['Two days', 'day before', 'That day'],
-                    'y': [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production],
-                    'text': [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production],
+                    'y': trace3_y,
+                    'text': trace3_y,
                     'name': 'H1',
                     'type': 'bar',
                     'textposition': 'outside',
@@ -180,21 +189,26 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'showlegend': True,
                                'legend': {"orientation": "h"},
-                               'xaxis': {'fixedrange': True}, 'yaxis': {'fixedrange': True}, },
+                               'xaxis': {'fixedrange': True},
+                               'yaxis': {'fixedrange': True, 'range': [0, yrange]},
+                                         },
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
 
             elif rec.variable_name == 'chart_2':
+                trace1_y = [self.float_num(productions[2].feed * 100 / 30), self.float_num(productions[1].feed * 100 / 30), self.float_num(productions[0].feed * 100 / 30)]
                 trace1 = {
                     'x': ['Two days', 'day before', 'That day'],
-                    'y': [self.float_num(productions[2].feed * 100 / 30), self.float_num(productions[1].feed * 100 / 30), self.float_num(productions[0].feed * 100 / 30)],
-                    'text': [self.float_num(productions[2].feed * 100 / 30), self.float_num(productions[1].feed * 100 / 30), self.float_num(productions[0].feed * 100 / 30)],
+                    'y': trace1_y,
+                    'text': trace1_y,
                     # 'textposition': 'auto',
                     # 'hoverinfo': 'none',
                     'name': 'Feed',
-                    'type': 'line',
-                            'textposition': 'top',
+                    'type': 'scatter',
+                    'mode': 'lines+text',
+                    'textposition': 'top',
+
                 }
                 plot_value = {
                     'data': [trace1, ],
@@ -202,8 +216,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'showlegend': True,
                                'legend': {"orientation": "h"},
-                               'xaxis': {'fixedrange': True},
-                               'yaxis': {'fixedrange': True, 'range': [0, 110],},
+                               'xaxis': {'fixedrange': True, 'nticks': 10,},
+                               'yaxis': {'fixedrange': True, 'range': [0, 110], 'domain': [0, 1],},
                                },
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
