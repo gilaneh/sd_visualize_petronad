@@ -31,14 +31,16 @@ class SdVisualizePetronadCalculate(models.Model):
 
     def petronad_ethylene_weekly(self, diagram=0, update_date=0):
         diagram = self.env['sd_visualize.diagram'].browse(diagram)
-        print(f'--------->\n    diagarm.select_date: {diagram.select_date}')
+        # print(f'--------->\n    diagarm.select_date: {diagram.select_date}')
         date_format = '%Y/%m/%d'
         calendar = self.env.context.get('lang')
         value_model = self.env['sd_visualize.values']
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
         week_production_plan = 126
+        report_date = date.fromisoformat(update_date)
 
-        production = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),]
+        production = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),
+                                                                ('production_date', '<=', report_date),]
                                                                , order='production_date desc', limit=1,)
         if len(production) == 0:
             raise ValidationError(f'Production not found')
@@ -238,7 +240,7 @@ class SdVisualizePetronadCalculate(models.Model):
                                    'title': _('Efficiency(%)'),
                                }
                                },
-                    'config': {'responsive': True, 'displayModeBar': False}
+                    'config': {'responsive': False, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_2':
@@ -294,7 +296,7 @@ class SdVisualizePetronadCalculate(models.Model):
                                    'title': _('Efficiency(%)'),
                                }
                                },
-                    'config': {'responsive': True, 'displayModeBar': False}
+                    'config': {'responsive': False, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_3':
@@ -367,7 +369,7 @@ class SdVisualizePetronadCalculate(models.Model):
                                    },
                                },
                                },
-                    'config': {'responsive': True, 'displayModeBar': False}
+                    'config': {'responsive': False, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_4':
@@ -440,7 +442,7 @@ class SdVisualizePetronadCalculate(models.Model):
                                    },
                                },
                                },
-                    'config': {'responsive': True, 'displayModeBar': False}
+                    'config': {'responsive': False, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
             elif rec.variable_name == 'chart_5':
@@ -492,7 +494,7 @@ class SdVisualizePetronadCalculate(models.Model):
                                    },
                                },
                                },
-                    'config': {'responsive': True, 'displayModeBar': False}
+                    'config': {'responsive': False, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
             # MEG

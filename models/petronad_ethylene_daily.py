@@ -33,13 +33,14 @@ class SdVisualizePetronadCalculateDaily(models.Model):
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
 
         report_date = date.fromisoformat(update_date)
-        print(f'''
-    {update_date} {report_date}
-''')
+
 
         productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),
                                                                  ('production_date', '<=', report_date),
                                                                  ],order='production_date desc', limit=3,)
+        print(f'''
+            report_date: {report_date} productions[0].production_date: {productions[0].production_date}
+''')
         if len(productions) == 0:
             raise ValidationError(f'Production not found')
         storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),('storage_date', '<=', productions[0].production_date)],order='storage_date desc', limit=1,)
@@ -159,14 +160,11 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace1_y = [productions[2].feed, productions[1].feed, productions[0].feed]
                 trace2_y = [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production]
                 trace3_y = [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production]
+                trace4_y = [30, 30, 30]
                 yrange = int(max(trace1_y + trace2_y + trace3_y) * 1.5)
-                print(f'''
-
-            yrange: {yrange}
-
-''')
+                chart_1_trace_x = ['دو روز قبل', 'روز قبل', 'روز جاری']
                 trace1 = {
-                    'x': ['Two days', 'day before', 'That day'],
+                    'x': chart_1_trace_x,
                     'y': trace1_y,
                     'text': trace1_y,
                     'name': 'Feed',
@@ -174,7 +172,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'textposition': 'outside',
                 }
                 trace2 = {
-                    'x': ['Two days', 'day before', 'That day'],
+                    'x': chart_1_trace_x,
                     'y': trace2_y,
                     'text': trace2_y,
                     'name': 'MEG',
@@ -182,16 +180,31 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'textposition': 'outside',
                 }
                 trace3 = {
-                    'x': ['Two days', 'day before', 'That day'],
+                    'x': chart_1_trace_x,
                     'y': trace3_y,
                     'text': trace3_y,
                     'name': 'H1',
                     'type': 'bar',
                     'textposition': 'outside',
                 }
+                trace4 = {
+                    'x': chart_1_trace_x,
+                    'y': trace4_y,
+                    'text': trace4_y,
+                    'name': 'ظرفیت',
+                    'type': 'scatter',
+                    'mode': 'lines',
+                    'textposition': 'outside',
+
+                    'line': {
+                        'dash': 'dash',
+                        'width': 2,
+                        'color': 'rgb(0,110,200)',
+                    }
+                }
 
                 plot_value = {
-                    'data': [trace1, trace2, trace3, ],
+                    'data': [trace1, trace2, trace3, trace4, ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'showlegend': True,
@@ -204,9 +217,11 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 value = json.dumps(plot_value)
 
             elif rec.variable_name == 'chart_2':
+                chart_2_trace_x = ['دو روز قبل', 'روز قبل', 'روز جاری']
+
                 trace1_y = [self.float_num(productions[2].feed * 100 / 30), self.float_num(productions[1].feed * 100 / 30), self.float_num(productions[0].feed * 100 / 30)]
                 trace1 = {
-                    'x': ['Two days', 'day before', 'That day'],
+                    'x': chart_2_trace_x,
                     'y': trace1_y,
                     'text': trace1_y,
                     # 'textposition': 'auto',

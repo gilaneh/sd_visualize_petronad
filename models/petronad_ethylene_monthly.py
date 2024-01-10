@@ -33,19 +33,22 @@ class SdVisualizePetronadCalculate(models.Model):
 
     def petronad_ethylene_monthly(self, diagram=0, update_date=0):
         diagram = self.env['sd_visualize.diagram'].browse(diagram)
-        print(f'--------->\n Monthly, diagarm.select_date: {diagram.select_date}')
+        print(f'--------->\n Monthly, diagarm.select_date: {diagram.select_date} {update_date}')
         date_format = '%Y/%m/%d'
         calendar = self.env.context.get('lang')
         value_model = self.env['sd_visualize.values']
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
         month_production_plan = 720
+        report_date = date.fromisoformat(update_date)
+        # todo: report_date must be the latest date of the month. Mind the jalaali or gregorian calendar
 
-        production = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),]
-                                                               , order='production_date desc', limit=1,)
+        production = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),
+                                                                ('production_date', '<=', report_date), ]
+                                                               , order='production_date desc', limit=1, )
         if len(production) == 0:
             raise ValidationError(f'Production not found')
 
-        this_date = date.today()
+        this_date = report_date
         month_s_0, month_e_0 = self.month_start_end(this_date, 0, calendar)
         month_s_1, month_e_1 = self.month_start_end(this_date, -1, calendar)
         month_s_2, month_e_2 = self.month_start_end(this_date, -2, calendar)
