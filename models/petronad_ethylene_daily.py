@@ -161,7 +161,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace2_y = [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production]
                 trace3_y = [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production]
                 trace4_y = [30, 30, 30]
-                yrange = int(max(trace1_y + trace2_y + trace3_y) * 1.5)
+                yrange = int(max(trace1_y + trace2_y + trace3_y) * 1.3)
                 chart_1_trace_x = ['دو روز قبل', 'روز قبل', 'روز جاری']
                 trace1 = {
                     'x': chart_1_trace_x,
