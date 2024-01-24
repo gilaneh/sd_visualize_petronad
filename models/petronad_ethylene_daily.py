@@ -9,6 +9,15 @@ import jdatetime
 from odoo.exceptions import AccessError, ValidationError, MissingError, UserError
 import json
 import traceback
+import plotly.express as px
+import plotly
+import plotly.io as pio
+import base64
+# import kaleido
+import os
+
+import plotly.offline
+import plotly.graph_objs as go
 
 
 class SdVisualizePetronadCalculateDaily(models.Model):
@@ -33,14 +42,17 @@ class SdVisualizePetronadCalculateDaily(models.Model):
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
 
         report_date = date.fromisoformat(update_date)
-
+        print(f'''
+                    {report_date} 
+                    {diagram.project.id}
+                ''')
 
         productions = self.env['km_petronad.production'].search([('project', '=', diagram.project.id),
                                                                  ('production_date', '<=', report_date),
                                                                  ],order='production_date desc', limit=3,)
-        print(f'''
-            report_date: {report_date} productions[0].production_date: {productions[0].production_date}
-''')
+#         print(f'''
+#             report_date: {report_date} productions[0].production_date: {productions[0].production_date}
+# ''')
         if len(productions) == 0:
             raise ValidationError(f'Production not found')
         storages = self.env['km_petronad.storage'].search([('project', '=', diagram.project.id),('storage_date', '<=', productions[0].production_date)],order='storage_date desc', limit=1,)
@@ -214,6 +226,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                          },
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
+
+
                 value = json.dumps(plot_value)
 
             elif rec.variable_name == 'chart_2':
@@ -244,8 +258,6 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
-
-
 
             else:
                 continue
