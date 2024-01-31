@@ -189,8 +189,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             elif rec.variable_name == 'tank_total_capacity':
                 value = self.float_num(sum(tank_capacity), 2)
             # Comments
-            elif rec.variable_name == 'comments':
-                value = self.env['km_petronad.comments'].search([('comment_date', '=', report_date)]).description
+            elif rec.variable_name == 'comments_daily':
+                value = self.env['km_petronad.comments_daily'].search([('comment_date', '=', report_date)]).description
             #     value = self.float_num(storages.meg_storage, 2)
             # # DEG
             # elif rec.variable_name == 'deg_storage':
@@ -307,6 +307,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace6_y = {
                         'x': chart_1_trace_x,
                         'y': trace6_y,
+                        'showlegend': False,
                         'type': "bar",
                         'name': "H1",
                         'xaxis': 'x3',
@@ -337,125 +338,18 @@ class SdVisualizePetronadCalculateDaily(models.Model):
 
                 value = json.dumps(plot_value)
 
-
-            elif rec.variable_name == 'chart_11':
-                # feeds_1 = [rec.amount for rec in productions if rec.data_date == report_date and rec.fluid == 'FEED' and rec.amount < 0]
-
-
-                # trace1_y = [productions[2].feed, productions[1].feed, productions[0].feed]
-                # trace2_y = [productions[2].meg_production, productions[1].meg_production, productions[0].meg_production]
-                # trace3_y = [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production]
-
-                trace1_y = [feeds_3 , feeds_2, feeds_1 ]
-                trace2_y = [meg_3, meg_2, meg_1 ]
-                trace3_y = [deg_3, deg_2, deg_1 ]
-                trace4_y = [teg_3, teg_2, teg_1 ]
-                trace5_y = [h1_3, h1_2, h1_1 ]
-                trace9_y = [30, 30, 30]
-                yrange = int(max(trace1_y + trace2_y + trace3_y) * 1.3)
-                chart_1_trace_x = [s_start_date_3, s_start_date_2, s_start_date_1]
-                trace1 = {
-                    'x': chart_1_trace_x,
-                    'y': trace1_y,
-                    'text': trace1_y,
-                    'name': 'Feed',
-                    'type': 'bar',
-                    'textposition': ['outside','outside','inside',],
-                    'marker': {
-                        'color': 'rgb(110,50,160)'
-                    }
-                }
-                trace2 = {
-                    'x': chart_1_trace_x,
-                    'y': trace2_y,
-                    'text': trace2_y,
-                    'name': 'MEG',
-                    'type': 'bar',
-                    'textposition': 'outside',
-                    'marker': {
-                        'color': 'rgb(30,80,120)'
-                    }
-                }
-                trace3 = {
-                    'x': chart_1_trace_x,
-                    'y': trace3_y,
-                    'text': trace3_y,
-                    'name': 'DEG',
-                    'type': 'bar',
-                    'textposition': 'outside',
-                    'marker': {
-                        'color': 'rgb(0,110,200)'
-                    }
-                }
-                trace4 = {
-                    'x': chart_1_trace_x,
-                    'y': trace4_y,
-                    'text': trace4_y,
-                    'name': 'TEG',
-                    'type': 'bar',
-                    'textposition': 'outside',
-                    'marker': {
-                        'color': 'rgb(160,200,230)'
-                    }
-                }
-                trace5 = {
-                    'x': chart_1_trace_x,
-                    'y': trace5_y,
-                    'text': trace5_y,
-                    'showlegend': False,
-                    'name': 'H1',
-                    'type': 'bar',
-                    'textposition': 'outside',
-                    'marker': {
-                        'color': 'rgb(200,90,20)'
-                    }
-                }
-                trace9 = {
-                    'x': chart_1_trace_x,
-                    'y': trace9_y,
-                    'text': trace9_y,
-                    'name': 'ظرفیت',
-                    'type': 'scatter',
-                    'mode': 'lines',
-                    'textposition': 'outside',
-                    'line': {
-                        'dash': 'dash',
-                        'width': 2,
-                        'color': 'rgb(0,110,200)',
-                    }
-                }
-
-                plot_value = {
-                    'data': [trace1, trace2, trace3, trace4, trace5, trace9, ],
-                    'layout': {'autosize': False,
-                               'paper_bgcolor': 'rgb(255,255,255,0)',
-                               'showlegend': True,
-                               'barmode': 'stack',
-                               # 'legend': {"orientation": "h"},
-                               'legend': {'x': 1.2, 'y': 1, 'xanchor': 'right',},
-                               'xaxis': {'fixedrange': True},
-                               'yaxis': {'fixedrange': True, 'range': [0, yrange]},
-                                         },
-                    'config': {'responsive': True, 'displayModeBar': False}
-                }
-                # print(f'llllllll >>> {value}')
-
-
-                value = json.dumps(plot_value)
-
             elif rec.variable_name == 'chart_2':
-
                 chart_2_trace_x = tank_names
                 chart_2_trace_1 = tank_amounts
                 chart_2_trace_2 = tank_empty
                 chart_2_trace_3 = tank_capacity
                 tank_range = int(max(tank_capacity) * 1.1)
 
-                def text_position(a):
-                    if a[0] / a[1] > .5:
-                        return 'top inside'
+                def text_position(a, m=max(tank_capacity)):
+                    if a[0] / m > .1:
+                        return a[0]
                     else:
-                        return 'top outside'
+                        return ''
                 def marker_color(a):
                     if a[0] / a[1] > .9:
                         return 'rgb(160,70,120)'
@@ -474,13 +368,15 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace1 = {
                     'x': chart_2_trace_x,
                     'y': chart_2_trace_1,
-                    'text': chart_2_trace_1,
-                    'textposition': 'inside',
-                    # 'hoverinfo': 'none',
+                    'text': text_p,
+                    'textposition': 'top outside',
+                    'hoverinfo': 'none',
+                    'textangle': 0,
+                    # 'textfont': {'size': [30, 1,10,10,10,10,10]},
+                    'constraintext': 'none',
                     'name': 'موجودی',
                     'type': 'bar',
                     # 'mode': 'bar+text',
-                    'textposition': 'auto',
                     'marker': {
                         'color': marker_c
                     }
@@ -490,11 +386,11 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'y': chart_2_trace_2,
                     'text': chart_2_trace_2,
                     'textposition': 'inside',
-                    # 'hoverinfo': 'none',
+                    'textangle': 'horizontal',
+                    'hoverinfo': 'none',
                     'name': 'باقی مانده',
                     'type': 'bar',
                     # 'mode': 'bar+text',
-                    'textposition': 'top',
                     'marker': {
                         'color': 'rgb(170,170,170)'
                     }
@@ -503,12 +399,12 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'x': chart_2_trace_x,
                     'y': chart_2_trace_3,
                     'text': chart_2_trace_3,
-                    'textposition': 'outside',
-                    # 'hoverinfo': 'none',
+                    'textposition': 'top',
+                    'textangle': 'horizontal',
+                    'hoverinfo': 'none',
                     'name': 'ظرفیت',
                     # 'type': 'bar',
                     'mode': 'text',
-                    'textposition': 'top',
                     'marker': {
                         'size': 26,
                         'offset': .2,
@@ -519,6 +415,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                # 'plot_bgcolor': 'rgb(255,255,255,0)',
+                               'orientation': 'v',
+
                                'showlegend': True,
                                'barmode': 'stack',
                                'legend': {'x': 1.2, 'y': 1, 'xanchor': 'right',

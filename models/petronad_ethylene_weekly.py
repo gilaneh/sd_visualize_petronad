@@ -135,6 +135,8 @@ class SdVisualizePetronadCalculate(models.Model):
                 value = jdatetime.date.fromgregorian(date=week_s_0).weeknumber()
             elif rec.variable_name == 'year':
                 value = jdatetime.date.fromgregorian(date=week_s_0).year
+            elif rec.variable_name == 'comments_weekly':
+                value = self.env['km_petronad.comments_weekly'].search([('comment_date', '=', week_e_0)]).description
 
             elif rec.variable_name == 'chart_1':
                 week_no_0 = jdatetime.date.fromgregorian(date=week_s_0).weeknumber()
