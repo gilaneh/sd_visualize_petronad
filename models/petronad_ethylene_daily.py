@@ -85,46 +85,46 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             s_start_date_3 = (report_date - timedelta(days=2)).strftime("%Y/%m/%d")
             # s_storage_date = storages.storage_date.strftime("%Y/%m/%d")
             # s_end_date = end_date.strftime("%Y/%m/%d")
-        feeds_1 = abs(sum(list([rec.amount for rec in productions if
+        feeds_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
                                 rec.data_date == report_date and rec.fluid.name == 'FEED' and rec.amount < 0])))
-        feeds_2 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        feeds_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=1) and rec.fluid.name == 'FEED' and rec.amount < 0])))
-        feeds_3 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        feeds_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=2) and rec.fluid.name == 'FEED' and rec.amount < 0])))
 
-        meg_1 = abs(sum(list([rec.amount for rec in productions if
+        meg_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
                               rec.data_date == report_date and rec.fluid.name == 'MEG' and rec.amount > 0])))
-        meg_2 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        meg_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=1) and rec.fluid.name == 'MEG' and rec.amount > 0])))
-        meg_3 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        meg_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=2) and rec.fluid.name == 'MEG' and rec.amount > 0])))
 
-        deg_1 = abs(sum(list([rec.amount for rec in productions if
+        deg_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
                               rec.data_date == report_date and rec.fluid.name == 'DEG' and rec.amount > 0])))
-        deg_2 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        deg_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=1) and rec.fluid.name == 'DEG' and rec.amount > 0])))
-        deg_3 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        deg_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=2) and rec.fluid.name == 'DEG' and rec.amount > 0])))
 
-        teg_1 = abs(sum(list([rec.amount for rec in productions if
+        teg_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
                               rec.data_date == report_date and rec.fluid.name == 'TEG' and rec.amount > 0])))
-        teg_2 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        teg_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=1) and rec.fluid.name == 'TEG' and rec.amount > 0])))
-        teg_3 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        teg_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=2) and rec.fluid.name == 'TEG' and rec.amount > 0])))
 
-        h1_1 = abs(sum(list([rec.amount for rec in productions if
+        h1_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
                              rec.data_date == report_date and rec.fluid.name == 'H1' and rec.amount > 0])))
-        h1_2 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        h1_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=1) and rec.fluid.name == 'H1' and rec.amount > 0])))
-        h1_3 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        h1_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=2) and rec.fluid.name == 'H1' and rec.amount > 0])))
 
-        h2_1 = abs(sum(list([rec.amount for rec in productions if
+        h2_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
                              rec.data_date == report_date and rec.fluid.name == 'H2' and rec.amount > 0])))
-        h2_2 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        h2_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=1) and rec.fluid.name == 'H2' and rec.amount > 0])))
-        h2_3 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
+        h2_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
             days=2) and rec.fluid.name == 'H2' and rec.amount > 0])))
 
         feed_h1_1 = abs(sum(list([rec.amount for rec in productions if
@@ -143,7 +143,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
         tank_empty = []
         tank_capacity = []
         for rec in all_tanks:
-            amount = rec.amount + sum(list([-1 * re.amount for re in duration_pro if re.fluid == rec.fluid ]))
+            amount = self.ton_amount(rec) + sum(list([-1 * self.ton_amount(re) for re in duration_pro if re.fluid == rec.fluid ]))
             tank_amounts.append(amount)
             tank_empty.append(rec.capacity - amount)
             tank_capacity.append(rec.capacity )
@@ -439,5 +439,6 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             value_model.browse(rec[0]).write({'value': rec[1]})
         return {'name': 'arash'}
 
-
+    def ton_amount(self, rec):
+        return int(rec.amount * 0.001) if rec.unit == 'kg' else rec.amount
 

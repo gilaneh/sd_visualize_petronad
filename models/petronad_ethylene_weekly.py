@@ -75,14 +75,15 @@ class SdVisualizePetronadCalculate(models.Model):
         week_production_3 = [rec for rec in productions if rec.data_date >= week_s_3 and rec.data_date <= week_e_3]
         week_production_4 = [rec for rec in productions if rec.data_date >= week_s_4 and rec.data_date <= week_e_4]
         week_production_5 = [rec for rec in productions if rec.data_date >= week_s_5 and rec.data_date <= week_e_5]
-        week_sum_feed = sum(list([rec.amount for rec in week_production_0 if rec.fluid.name in ['FEED'] and rec.amount < 0]))
-        week_sum_feed_h1 = sum(list([rec.amount for rec in week_production_0 if rec.fluid.name in ['H1'] and rec.amount < 0]))
+
+        week_sum_feed = sum(list([self.ton_amount(rec) for rec in week_production_0 if rec.fluid.name in ['FEED'] and rec.amount < 0]))
+        week_sum_feed_h1 = sum(list([self.ton_amount(rec) for rec in week_production_0 if rec.fluid.name in ['H1'] and rec.amount < 0]))
         week_productions_list = {'meg': [], 'deg': [], 'teg': [], }
         date_week_day = list([week_s_0 + timedelta(days=i) for i in range(7)])
         for rec_date in date_week_day:
-            day_meg = sum(list([rec.amount for rec in week_production_0 if rec.fluid.name in ['MEG'] and rec.amount > 0 and rec.data_date == rec_date]))
-            day_deg = sum(list([rec.amount for rec in week_production_0 if rec.fluid.name in ['DEG'] and rec.amount > 0 and rec.data_date == rec_date]))
-            day_teg = sum(list([rec.amount for rec in week_production_0 if rec.fluid.name in ['TEG'] and rec.amount > 0 and rec.data_date == rec_date]))
+            day_meg = sum(list([self.ton_amount(rec) for rec in week_production_0 if rec.fluid.name in ['MEG'] and rec.amount > 0 and rec.data_date == rec_date]))
+            day_deg = sum(list([self.ton_amount(rec) for rec in week_production_0 if rec.fluid.name in ['DEG'] and rec.amount > 0 and rec.data_date == rec_date]))
+            day_teg = sum(list([self.ton_amount(rec) for rec in week_production_0 if rec.fluid.name in ['TEG'] and rec.amount > 0 and rec.data_date == rec_date]))
             week_productions_list['meg'].append(day_meg)
             week_productions_list['deg'].append(day_deg)
             week_productions_list['teg'].append(day_teg)
@@ -91,11 +92,11 @@ class SdVisualizePetronadCalculate(models.Model):
         week_sum_deg = sum(week_productions_list['deg'])
         week_sum_teg = sum(week_productions_list['teg'])
 
-        week_sum_h1 = sum(list([rec.amount for rec in week_production_0 if rec.fluid.name in ['H1'] and rec.amount > 0]))
-        week_sum_h2 = sum(list([rec.amount for rec in week_production_0 if rec.fluid.name in ['H2'] and rec.amount > 0]))
-        week_sum_production_0 = sum(list([rec.amount for rec in week_production_0 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
-        week_sum_production_1 = sum(list([rec.amount for rec in week_production_1 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
-        week_sum_production_2 = sum(list([rec.amount for rec in week_production_2 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
+        week_sum_h1 = sum(list([self.ton_amount(rec) for rec in week_production_0 if rec.fluid.name in ['H1'] and rec.amount > 0]))
+        week_sum_h2 = sum(list([self.ton_amount(rec) for rec in week_production_0 if rec.fluid.name in ['H2'] and rec.amount > 0]))
+        week_sum_production_0 = sum(list([self.ton_amount(rec) for rec in week_production_0 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
+        week_sum_production_1 = sum(list([self.ton_amount(rec) for rec in week_production_1 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
+        week_sum_production_2 = sum(list([self.ton_amount(rec) for rec in week_production_2 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
 
 
         # Results ##################################
@@ -331,3 +332,5 @@ class SdVisualizePetronadCalculate(models.Model):
             new_record_list[index] = rec
         return new_record_list
 
+    def ton_amount(self, rec):
+        return int(rec.amount * 0.001) if rec.unit == 'kg' else rec.amount
