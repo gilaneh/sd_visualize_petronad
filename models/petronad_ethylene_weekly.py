@@ -38,16 +38,9 @@ class SdVisualizePetronadCalculate(models.Model):
         week_production_plan = 126
         report_date = date.fromisoformat(update_date)
 
-        production = self.env['km_petronad.production_record'].search([
-                                                                ('data_date', '<=', report_date),]
-                                                               , order='data_date desc', limit=1,)
-        if len(production) == 0:
-            raise ValidationError(f'Production not found')
+        # to fix selection of friday. This way it pretends it is selected wednesday.
+        this_date = report_date - timedelta(days=2) if report_date.weekday() == 4 else report_date
 
-        # finding tha last week
-        # week_e_x : friday
-        # week_s_x : saturday
-        this_date = production.data_date
         week_e_0 = this_date + relativedelta(weekday=FR(-1))
         week_s_0 = week_e_0 + relativedelta(weekday=SA(-1))
         week_e_1 = this_date + relativedelta(weekday=FR(-2))
@@ -60,15 +53,14 @@ class SdVisualizePetronadCalculate(models.Model):
         week_s_4 = week_e_0 + relativedelta(weekday=SA(-5))
         week_e_5 = this_date + relativedelta(weekday=FR(-6))
         week_s_5 = week_e_0 + relativedelta(weekday=SA(-6))
-        print(f'--------->\n    this_date: {this_date} {week_s_0} {week_e_0}')
 
         # Production ##################################
         productions = self.env['km_petronad.production_record'].search([
                                                                  ('data_date', '>=', week_s_5),
                                                                  ('data_date', '<=', week_e_0), ]
                                                                 ,order='data_date desc', )
-        if len(productions) == 0:
-            raise ValidationError(f'Production not found')
+        # if len(productions) != 0:
+            # raise ValidationError(f'Production not found')
         week_production_0 = [rec for rec in productions if rec.data_date >= week_s_0 and rec.data_date <= week_e_0]
         week_production_1 = [rec for rec in productions if rec.data_date >= week_s_1 and rec.data_date <= week_e_1]
         week_production_2 = [rec for rec in productions if rec.data_date >= week_s_2 and rec.data_date <= week_e_2]
@@ -106,7 +98,22 @@ class SdVisualizePetronadCalculate(models.Model):
                 continue
             elif rec.variable_name == 'test':
                 value = f'{week_productions_list} '
+            elif rec.variable_name == 'week_days':
+                # value = f'{self.convert_date(calendar, week_e_0)}  -  {self.convert_date(calendar, week_s_0)}'
+                value = f'''
+                    <div class="d-flex flex-column align-items-end">
+                        <div>{self.convert_date(calendar, week_s_0)}</div>
+                        <div>{self.convert_date(calendar, week_e_0)}</div>
+                    </div>
+                        '''
+            elif rec.variable_name == 'week_no':
+                value = jdatetime.date.fromgregorian(date=week_s_0).weeknumber()
+            elif rec.variable_name == 'year':
+                value = jdatetime.date.fromgregorian(date=week_s_0).year
+            elif rec.variable_name == 'comments_weekly':
+                value = self.env['km_petronad.comments_weekly'].search([('comment_date', '=', week_e_0)]).description
 
+            # if len(productions) != 0:
             elif rec.variable_name == 'week_sum_feed':
                 value = abs(week_sum_feed)
             elif rec.variable_name == 'week_sum_feed_h1':
@@ -124,20 +131,6 @@ class SdVisualizePetronadCalculate(models.Model):
 
             elif rec.variable_name == 'week_sum_production':
                 value = week_sum_production_0
-            elif rec.variable_name == 'week_days':
-                # value = f'{self.convert_date(calendar, week_e_0)}  -  {self.convert_date(calendar, week_s_0)}'
-                value = f'''
-                    <div class="d-flex flex-column align-items-end">
-                        <div>{self.convert_date(calendar, week_s_0)}</div>
-                        <div>{self.convert_date(calendar, week_e_0)}</div>
-                    </div>
-                        '''
-            elif rec.variable_name == 'week_no':
-                value = jdatetime.date.fromgregorian(date=week_s_0).weeknumber()
-            elif rec.variable_name == 'year':
-                value = jdatetime.date.fromgregorian(date=week_s_0).year
-            elif rec.variable_name == 'comments_weekly':
-                value = self.env['km_petronad.comments_weekly'].search([('comment_date', '=', week_e_0)]).description
 
             elif rec.variable_name == 'chart_1':
                 week_no_0 = jdatetime.date.fromgregorian(date=week_s_0).weeknumber()
@@ -309,7 +302,6 @@ class SdVisualizePetronadCalculate(models.Model):
                     'config': {'responsive': False, 'displayModeBar': False}
                 }
                 value = json.dumps(plot_value)
-
 
             else:
                 continue

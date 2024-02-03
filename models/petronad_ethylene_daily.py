@@ -40,24 +40,11 @@ class SdVisualizePetronadCalculateDaily(models.Model):
         calendar = self.env.context.get('lang')
         value_model = self.env['sd_visualize.values']
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
-
         report_date = date.fromisoformat(update_date)
-        print(f'''
-                    {report_date} 
-                    {diagram.project.id}
-                ''')
-
         productions = self.env['km_petronad.production_record'].search([('data_date', '<=', report_date),('data_date', '>=', report_date - timedelta(days=2)), ])
+        # if len(productions) == 0:
+        #     raise ValidationError(f'Production not found')
 
-        print(f'''
-            report_date: {report_date} 
-            productions: {productions}
-''')
-        if len(productions) == 0:
-            raise ValidationError(f'Production not found')
-        # storages = self.env['km_petronad.storage_tanks'].search([])
-        # if  len(storages) == 0:
-        #     raise ValidationError(f'Storage not found')
         tanks = self.env['km_petronad.storage_tanks'].search([])
         if  len(tanks) == 0:
             raise ValidationError(f'Tank not found')

@@ -42,19 +42,19 @@ class SdVisualizePetronadCalculate(models.Model):
         report_date = date.fromisoformat(update_date)
         # todo: report_date must be the latest date of the month. Mind the jalaali or gregorian calendar
 
-        production = self.env['km_petronad.production_record'].search([
-                                                                ('data_date', '<=', report_date),]
-                                                               , order='data_date desc', limit=1,)
-        if len(production) == 0:
-            raise ValidationError(f'Production not found')
+        # production = self.env['km_petronad.production_record'].search([
+        #                                                         ('data_date', '<=', report_date),]
+        #                                                        , order='data_date desc', limit=1,)
+        # if len(production) == 0:
+        #     raise ValidationError(f'Production not found')
 
         this_date = report_date
-        month_s_0, month_e_0 = self.month_start_end(this_date, 0, calendar)
-        month_s_1, month_e_1 = self.month_start_end(this_date, -1, calendar)
-        month_s_2, month_e_2 = self.month_start_end(this_date, -2, calendar)
-        month_s_3, month_e_3 = self.month_start_end(this_date, -3, calendar)
-        month_s_4, month_e_4 = self.month_start_end(this_date, -4, calendar)
-        month_s_5, month_e_5 = self.month_start_end(this_date, -5, calendar)
+        month_s_0, month_e_0 = self.month_start_end(this_date, -1, calendar)
+        month_s_1, month_e_1 = self.month_start_end(this_date, -2, calendar)
+        month_s_2, month_e_2 = self.month_start_end(this_date, -3, calendar)
+        month_s_3, month_e_3 = self.month_start_end(this_date, -4, calendar)
+        month_s_4, month_e_4 = self.month_start_end(this_date, -5, calendar)
+        month_s_5, month_e_5 = self.month_start_end(this_date, -6, calendar)
 
         # Production ##################################
         productions = self.env['km_petronad.production_record'].search([
@@ -62,8 +62,8 @@ class SdVisualizePetronadCalculate(models.Model):
                                                                  ('data_date', '<=', month_e_0), ]
                                                                 ,order='data_date desc', )
 
-        if len(productions) == 0:
-            raise ValidationError(f'Production not found')
+        # if len(productions) == 0:
+        #     raise ValidationError(f'Production not found')
         month_production_0 = [rec for rec in productions if rec.data_date >= month_s_0 and rec.data_date <= month_e_0]
         month_production_1 = [rec for rec in productions if rec.data_date >= month_s_1 and rec.data_date <= month_e_1]
         month_production_2 = [rec for rec in productions if rec.data_date >= month_s_2 and rec.data_date <= month_e_2]
