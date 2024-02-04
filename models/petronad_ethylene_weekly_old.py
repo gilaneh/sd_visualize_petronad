@@ -506,10 +506,10 @@ class SdVisualizePetronadCalculate(models.Model):
             # TEG
             elif rec.variable_name == 'teg_storage':
                 value = self.float_num(storages.teg_storage, 2)
-            # H1
+            # HEAVY1
             elif rec.variable_name == 'h1_storage':
                 value = self.float_num(storages.h1_storage, 2)
-            # H2
+            # HEAVY2
             elif rec.variable_name == 'h2_storage':
                 value = self.float_num(storages.h2_storage, 2)
             # WW
@@ -531,10 +531,10 @@ class SdVisualizePetronadCalculate(models.Model):
             # TEG
             elif rec.variable_name == 'teg_tank':
                 value = self.float_num(tanks.teg_tank - storages.teg_storage, 2)
-            # H1
+            # HEAVY1
             elif rec.variable_name == 'h1_tank':
                 value = self.float_num(tanks.h1_tank - storages.h1_storage, 2)
-            # H2
+            # HEAVY2
             elif rec.variable_name == 'h2_tank':
                 value = self.float_num(tanks.h2_tank - storages.h2_storage, 2)
             # WW

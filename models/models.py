@@ -79,10 +79,10 @@ class SdVisualizePetronadCalculate(models.Model):
             # TEG
             elif rec.variable_name == 'teg_production':
                 value = self.float_num(productions[0].teg_production, 2)
-            # H1
+            # HEAVY1
             elif rec.variable_name == 'h1_production':
                 value = self.float_num(productions[0].h1_production, 2)
-            # H2
+            # HEAVY2
             elif rec.variable_name == 'h2_production':
                 value = self.float_num(productions[0].h2_production, 2)
             # WW
@@ -103,10 +103,10 @@ class SdVisualizePetronadCalculate(models.Model):
             # TEG
             elif rec.variable_name == 'teg_storage':
                 value = self.float_num(storages.teg_storage, 2)
-            # H1
+            # HEAVY1
             elif rec.variable_name == 'h1_storage':
                 value = self.float_num(storages.h1_storage, 2)
-            # H2
+            # HEAVY2
             elif rec.variable_name == 'h2_storage':
                 value = self.float_num(storages.h2_storage, 2)
             # WW
@@ -128,10 +128,10 @@ class SdVisualizePetronadCalculate(models.Model):
             # TEG
             elif rec.variable_name == 'teg_tank':
                 value = self.float_num(tanks.teg_tank - storages.teg_storage, 2)
-            # H1
+            # HEAVY1
             elif rec.variable_name == 'h1_tank':
                 value = self.float_num(tanks.h1_tank - storages.h1_storage, 2)
-            # H2
+            # HEAVY2
             elif rec.variable_name == 'h2_tank':
                 value = self.float_num(tanks.h2_tank - storages.h2_storage, 2)
             # WW
@@ -163,7 +163,7 @@ class SdVisualizePetronadCalculate(models.Model):
                 trace3 = {
                     'x': ['Two days', 'day before', 'That day'],
                     'y': [productions[2].h1_production, productions[1].h1_production, productions[0].h1_production],
-                    'name': 'H1',
+                    'name': 'HEAVY1',
                     'type': 'bar'
                 }
 

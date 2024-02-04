@@ -101,25 +101,25 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             days=2) and rec.fluid.name == 'TEG' and rec.amount > 0])))
 
         h1_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                             rec.data_date == report_date and rec.fluid.name == 'H1' and rec.amount > 0])))
+                             rec.data_date == report_date and rec.fluid.name == 'HEAVY1' and rec.amount > 0])))
         h1_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'H1' and rec.amount > 0])))
+            days=1) and rec.fluid.name == 'HEAVY1' and rec.amount > 0])))
         h1_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'H1' and rec.amount > 0])))
+            days=2) and rec.fluid.name == 'HEAVY1' and rec.amount > 0])))
 
         h2_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                             rec.data_date == report_date and rec.fluid.name == 'H2' and rec.amount > 0])))
+                             rec.data_date == report_date and rec.fluid.name == 'HEAVY2' and rec.amount > 0])))
         h2_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'H2' and rec.amount > 0])))
+            days=1) and rec.fluid.name == 'HEAVY2' and rec.amount > 0])))
         h2_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'H2' and rec.amount > 0])))
+            days=2) and rec.fluid.name == 'HEAVY2' and rec.amount > 0])))
 
         feed_h1_1 = abs(sum(list([rec.amount for rec in productions if
-                             rec.data_date == report_date and rec.fluid.name == 'H1' and rec.amount < 0])))
+                             rec.data_date == report_date and rec.fluid.name == 'HEAVY1' and rec.amount < 0])))
         feed_h1_2 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'H1' and rec.amount < 0])))
+            days=1) and rec.fluid.name == 'HEAVY1' and rec.amount < 0])))
         feed_h1_3 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'H1' and rec.amount < 0])))
+            days=2) and rec.fluid.name == 'HEAVY1' and rec.amount < 0])))
 
         all_tanks = self.env['km_petronad.storage_tanks'].search([])
 
@@ -157,10 +157,10 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             # Production sum
             elif rec.variable_name == 'sum_of_production':
                 value = self.float_num((meg_1 + deg_1 + teg_1), 2)
-            # H1
+            # HEAVY1
             elif rec.variable_name == 'h1_production':
                 value = self.float_num(h1_1, 2)
-            # H2
+            # HEAVY2
             elif rec.variable_name == 'h2_production':
                 value = self.float_num(h2_1, 2)
             # WW
@@ -185,10 +185,10 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             # # TEG
             # elif rec.variable_name == 'teg_storage':
             #     value = self.float_num(storages.teg_storage, 2)
-            # # H1
+            # # HEAVY1
             # elif rec.variable_name == 'h1_storage':
             #     value = self.float_num(storages.h1_storage, 2)
-            # # H2
+            # # HEAVY2
             # elif rec.variable_name == 'h2_storage':
             #     value = self.float_num(storages.h2_storage, 2)
             # # WW
@@ -210,10 +210,10 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             # # TEG
             # elif rec.variable_name == 'teg_tank':
             #     value = self.float_num(tanks.teg_tank - storages.teg_storage, 2)
-            # # H1
+            # # HEAVY1
             # elif rec.variable_name == 'h1_tank':
             #     value = self.float_num(tanks.h1_tank - storages.h1_storage, 2)
-            # # H2
+            # # HEAVY2
             # elif rec.variable_name == 'h2_tank':
             #     value = self.float_num(tanks.h2_tank - storages.h2_storage, 2)
             # # WW
@@ -235,14 +235,20 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace2_y = [deg_3, deg_2, deg_1 ]
                 trace3_y = [teg_3, teg_2, teg_1 ]
                 trace4_y = [h1_3, h1_2, h1_1 ]
+                trace1234_y = [trace1_y[i] + trace2_y[i] + trace3_y[i] + trace4_y[i] for i in range(3)]
+                print(f'>>>>>>>\n trace1234_y: {trace1234_y}')
                 trace5_y = [feeds_3 , feeds_2, feeds_1 ]
                 trace6_y = [feed_h1_3, feed_h1_2, feed_h1_1 ]
+                trace56_y = [trace5_y[i] + trace6_y[i] for i in range(3)]
                 trace9_y = [30, 30, 30]
                 yrange = int(max(trace1_y + trace2_y + trace3_y) * 1.3)
                 chart_1_trace_x = [s_start_date_3, s_start_date_2, s_start_date_1]
-                trace1_y =  {
+                trace1 =  {
                         'x': chart_1_trace_x,
                         'y': trace1_y,
+                        'text': [rec if rec > 3 else '' for rec in trace1_y],
+                    'textposition': 'top',
+                    'textangle': 0,
                         'type': "bar",
                         'name': "MEG",
                         'xaxis': 'x1',
@@ -251,9 +257,12 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                         'marker': {'color': 'rgb(30,80,120)'},
                     }
 
-                trace2_y = {
+                trace2 = {
                         'x': chart_1_trace_x,
                         'y': trace2_y,
+                        'text': [rec if rec > 3 else '' for rec in trace2_y],
+                    'textposition': 'top',
+                    'textangle': 0,
                         'type': "bar",
                         'name': "DEG",
                         'xaxis': 'x1',
@@ -261,9 +270,12 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                         'offset': 0.05,
                         'marker': {'color': 'rgb(0,110,200)'},
                     }
-                trace3_y = {
+                trace3 = {
                         'x': chart_1_trace_x,
                         'y': trace3_y,
+                        'text': [rec if rec > 3 else '' for rec in trace3_y],
+                    'textposition': 'top',
+                    'textangle': 0,
                         'type': "bar",
                         'name': "TEG",
                         'xaxis': 'x1',
@@ -271,40 +283,78 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                         'offset': 0.05,
                         'marker': {'color': 'rgb(160,200,230)'},
                     }
-                trace4_y = {
+                trace4 = {
                         'x': chart_1_trace_x,
                         'y': trace4_y,
+                        'text': [rec if rec > 3 else '' for rec in trace4_y],
+                    'textposition': 'top',
+                    'textangle': 0,
                         'type': "bar",
-                        'name': "H1",
+                        'name': "HEAVY1",
                         'xaxis': 'x1',
                         'width': 0.2,
                         'offset': 0.05,
                         'marker': {'color': 'rgb(200,90,20)'},
                     }
-                trace5_y = {
+                trace1234 = {
+                        'x': chart_1_trace_x,
+                        'y': trace1234_y ,
+                        'text': trace1234_y ,
+                        'showlegend': False,
+                        'xaxis': 'x1',
+                        'width': 0.2,
+                        'offset': 0.05,
+                    'type': 'scatter',
+                    'mode': 'lines+text',
+                    'textposition': 'top',
+                    'line': {
+                        'color': 'rgba(0,0,0,0)',
+                    }
+                    }
+                trace5 = {
                         'x': chart_1_trace_x,
                         'y': trace5_y,
+                        'text': [rec if rec > 3 else '' for rec in trace5_y],
+                    'textposition': 'top',
+                    'textangle': 0,
                         'type': "bar",
                         'name': "Feed",
                         'xaxis': 'x2',
                         'width': 0.2,
-                        'offset': -0.2,
+                        'offset': -0.27,
                         'barmode': 'stack', 'marker': {'color': 'rgb(110,50,160)'},
                     }
-                trace6_y = {
+                trace6 = {
                         'x': chart_1_trace_x,
                         'y': trace6_y,
+                        'text': [rec if rec > 3 else '' for rec in trace6_y],
+                    'textposition': 'top',
+                    'textangle': 0,
                         'showlegend': False,
                         'type': "bar",
-                        'name': "H1",
+                        'name': "HEAVY1",
                         'xaxis': 'x3',
                         'width': 0.2,
-                        'offset': -0.2,
+                        'offset': -0.27,
                         'barmode': 'stack', 'marker': {'color': 'rgb(200,90,20)'},
+                    }
+                trace56 = {
+                        'x': chart_1_trace_x,
+                        'y': trace56_y,
+                        'text': trace56_y,
+                        'showlegend': False,
+                        'xaxis': 'x2',
+                        'offset': -2,
+                    'type': 'scatter',
+                    'mode': 'lines+text',
+                    'textposition': 'top left',
+                    'line': {
+                        'color': 'rgba(0,0,0,0)',
+                    }
                     }
 
                 plot_value = {
-                    'data': [trace1_y, trace2_y, trace3_y, trace4_y, trace5_y, trace6_y, trace9_y ],
+                    'data': [trace1, trace2, trace3, trace4, trace1234, trace5, trace6, trace56, trace9_y ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'plot_bgcolor': 'rgba(255, 255, 255, 0)',
@@ -333,24 +383,18 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 tank_range = int(max(tank_capacity) * 1.1)
 
                 def text_position(a, m=max(tank_capacity)):
-                    if a[0] / m > .1:
+                    if m and a[0] / m > .1:
                         return a[0]
                     else:
                         return ''
                 def marker_color(a):
-                    if a[0] / a[1] > .9:
+                    if a[1] and a[0] / a[1] > .9:
                         return 'rgb(160,70,120)'
                     else:
                         return 'rgb(64,64,64)'
                 data_list = list(zip(tuple(chart_2_trace_1), tuple(chart_2_trace_3)))
                 text_p = list(map(text_position, data_list))
                 marker_c = list(map(marker_color, data_list))
-                print(f'''
-                text_p: {data_list}
-                text_p: {text_p}
-
-''')
-                # text_p: {text_p}
 
                 trace1 = {
                     'x': chart_2_trace_x,
