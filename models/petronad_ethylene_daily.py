@@ -72,68 +72,74 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             s_start_date_3 = (report_date - timedelta(days=2)).strftime("%Y/%m/%d")
             # s_storage_date = storages.storage_date.strftime("%Y/%m/%d")
             # s_end_date = end_date.strftime("%Y/%m/%d")
-        feeds_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                                rec.data_date == report_date and rec.fluid.name == 'FEED' and rec.amount < 0])))
-        feeds_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'FEED' and rec.amount < 0])))
-        feeds_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'FEED' and rec.amount < 0])))
+        feeds_1 = abs(sum(list([self.ton_amount(rec) for rec in productions
+                                if rec.data_date == report_date and rec.fluid.name == 'FEED'
+                                and rec.register_type == 'feed_usage'])))
+        feeds_2 = abs(sum(list([self.ton_amount(rec) for rec in productions
+                                if rec.data_date == report_date - timedelta(days=1)
+                                and rec.fluid.name == 'FEED'
+                                and rec.register_type == 'feed_usage'])))
+        feeds_3 = abs(sum(list([self.ton_amount(rec) for rec in productions
+                                if rec.data_date == report_date - timedelta(days=2)
+                                and rec.fluid.name == 'FEED'
+                                and rec.register_type == 'feed_usage'])))
 
         meg_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                              rec.data_date == report_date and rec.fluid.name == 'MEG' and rec.amount > 0])))
+                              rec.data_date == report_date and rec.fluid.name == 'MEG' and rec.register_type == 'production'])))
         meg_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'MEG' and rec.amount > 0])))
+            days=1) and rec.fluid.name == 'MEG' and rec.register_type == 'production'])))
         meg_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'MEG' and rec.amount > 0])))
+            days=2) and rec.fluid.name == 'MEG' and rec.register_type == 'production'])))
 
         deg_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                              rec.data_date == report_date and rec.fluid.name == 'DEG' and rec.amount > 0])))
+                              rec.data_date == report_date and rec.fluid.name == 'DEG' and rec.register_type == 'production'])))
         deg_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'DEG' and rec.amount > 0])))
+            days=1) and rec.fluid.name == 'DEG' and rec.register_type == 'production'])))
         deg_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'DEG' and rec.amount > 0])))
+            days=2) and rec.fluid.name == 'DEG' and rec.register_type == 'production'])))
 
         teg_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                              rec.data_date == report_date and rec.fluid.name == 'TEG' and rec.amount > 0])))
+                              rec.data_date == report_date and rec.fluid.name == 'TEG' and rec.register_type == 'production'])))
         teg_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'TEG' and rec.amount > 0])))
+            days=1) and rec.fluid.name == 'TEG' and rec.register_type == 'production'])))
         teg_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'TEG' and rec.amount > 0])))
+            days=2) and rec.fluid.name == 'TEG' and rec.register_type == 'production'])))
 
         h1_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                             rec.data_date == report_date and rec.fluid.name == 'HEAVY1' and rec.amount > 0])))
+                             rec.data_date == report_date and rec.fluid.name == 'HEAVY1' and rec.register_type == 'production'])))
         h1_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'HEAVY1' and rec.amount > 0])))
+            days=1) and rec.fluid.name == 'HEAVY1' and rec.register_type == 'production'])))
         h1_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'HEAVY1' and rec.amount > 0])))
+            days=2) and rec.fluid.name == 'HEAVY1' and rec.register_type == 'production'])))
 
         h2_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                             rec.data_date == report_date and rec.fluid.name == 'HEAVY2' and rec.amount > 0])))
+                             rec.data_date == report_date and rec.fluid.name == 'HEAVY2' and rec.register_type == 'production'])))
         h2_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'HEAVY2' and rec.amount > 0])))
+            days=1) and rec.fluid.name == 'HEAVY2' and rec.register_type == 'production'])))
         h2_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'HEAVY2' and rec.amount > 0])))
+            days=2) and rec.fluid.name == 'HEAVY2' and rec.register_type == 'production'])))
 
         feed_h1_1 = abs(sum(list([rec.amount for rec in productions if
-                             rec.data_date == report_date and rec.fluid.name == 'HEAVY1' and rec.amount < 0])))
+                             rec.data_date == report_date and rec.fluid.name == 'HEAVY1' and rec.register_type == 'feed_usage'])))
         feed_h1_2 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'HEAVY1' and rec.amount < 0])))
+            days=1) and rec.fluid.name == 'HEAVY1' and rec.register_type == 'feed_usage'])))
         feed_h1_3 = abs(sum(list([rec.amount for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'HEAVY1' and rec.amount < 0])))
+            days=2) and rec.fluid.name == 'HEAVY1' and rec.register_type == 'feed_usage'])))
 
         all_tanks = self.env['km_petronad.storage_tanks'].search([])
+        all_tanks = list([rec for rec in all_tanks if rec.fluid.name in ['FEED', 'MEG', 'DEG','TEG', 'HEAVY1', 'HEAVY2', ]])
 
 
         duration_pro = self.env['km_petronad.production_record'].search([('data_date', '>', report_date), ])
-        tank_names = list([rec.name for rec in all_tanks])
+        tank_names = list([f'{rec.name}<br>{rec.fluid.name}' for rec in all_tanks])
         tank_amounts = []
         tank_empty = []
         tank_capacity = []
         for rec in all_tanks:
             amount = self.ton_amount(rec) + sum(list([-1 * self.ton_amount(re) for re in duration_pro if re.fluid == rec.fluid ]))
-            tank_amounts.append(amount)
-            tank_empty.append(rec.capacity - amount)
-            tank_capacity.append(rec.capacity )
+            tank_amounts.append(int(amount / 1000))
+            tank_empty.append(int((rec.capacity - amount) / 1000))
+            tank_capacity.append(int(rec.capacity / 1000))
 
         # tank_amounts = list([rec.amount for rec in all_tanks ])
         # tank_empty = list([rec.capacity - rec.amount for rec in all_tanks])
@@ -177,7 +183,10 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 value = self.float_num(sum(tank_capacity), 2)
             # Comments
             elif rec.variable_name == 'comments_daily':
-                value = self.env['km_petronad.comments_daily'].search([('comment_date', '=', report_date)]).description
+                comments = self.env['km_petronad.comments_daily'].search([('comment_date', '=', report_date)])
+                value = ''
+                for comment in comments:
+                    value += comment.description
             #     value = self.float_num(storages.meg_storage, 2)
             # # DEG
             # elif rec.variable_name == 'deg_storage':
@@ -236,17 +245,17 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace3_y = [teg_3, teg_2, teg_1 ]
                 trace4_y = [h1_3, h1_2, h1_1 ]
                 trace1234_y = [trace1_y[i] + trace2_y[i] + trace3_y[i] + trace4_y[i] for i in range(3)]
-                print(f'>>>>>>>\n trace1234_y: {trace1234_y}')
                 trace5_y = [feeds_3 , feeds_2, feeds_1 ]
                 trace6_y = [feed_h1_3, feed_h1_2, feed_h1_1 ]
                 trace56_y = [trace5_y[i] + trace6_y[i] for i in range(3)]
                 trace9_y = [30, 30, 30]
-                yrange = int(max(trace1_y + trace2_y + trace3_y) * 1.3)
+                max_range = max(trace1234_y + trace56_y)
+                yrange = int(max_range * 1.2)
                 chart_1_trace_x = [s_start_date_3, s_start_date_2, s_start_date_1]
                 trace1 =  {
                         'x': chart_1_trace_x,
                         'y': trace1_y,
-                        'text': [rec if rec > 3 else '' for rec in trace1_y],
+                        'text': [rec if rec > .1 * max_range else '' for rec in trace1_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -260,7 +269,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace2 = {
                         'x': chart_1_trace_x,
                         'y': trace2_y,
-                        'text': [rec if rec > 3 else '' for rec in trace2_y],
+                        'text': [rec if rec > .1 * max_range else '' for rec in trace2_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -273,7 +282,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace3 = {
                         'x': chart_1_trace_x,
                         'y': trace3_y,
-                        'text': [rec if rec > 3 else '' for rec in trace3_y],
+                        'text': [rec if rec > .1 * max_range else '' for rec in trace3_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -286,7 +295,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace4 = {
                         'x': chart_1_trace_x,
                         'y': trace4_y,
-                        'text': [rec if rec > 3 else '' for rec in trace4_y],
+                        'text': [rec if rec > .1 * max_range else '' for rec in trace4_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -301,20 +310,20 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                         'y': trace1234_y ,
                         'text': trace1234_y ,
                         'showlegend': False,
-                        'xaxis': 'x1',
-                        'width': 0.2,
-                        'offset': 0.05,
-                    'type': 'scatter',
-                    'mode': 'lines+text',
-                    'textposition': 'top',
-                    'line': {
-                        'color': 'rgba(0,0,0,0)',
-                    }
-                    }
+                        # 'xaxis': 'x1',
+                        'yaxis': 'y2',
+                    'width': 0.2,
+                    'offset': 0.05,
+                    'type': 'bar',
+                    'mode': 'text',
+                    'textposition': 'outside',
+                    'marker': {'color': 'rgba(0,0,0,0)'},
+
+                }
                 trace5 = {
                         'x': chart_1_trace_x,
                         'y': trace5_y,
-                        'text': [rec if rec > 3 else '' for rec in trace5_y],
+                        'text': [rec if rec > .1 * max_range else '' for rec in trace5_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -327,7 +336,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace6 = {
                         'x': chart_1_trace_x,
                         'y': trace6_y,
-                        'text': [rec if rec > 3 else '' for rec in trace6_y],
+                        'text': [rec if rec > .1 * max_range else '' for rec in trace6_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'showlegend': False,
@@ -344,17 +353,30 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                         'text': trace56_y,
                         'showlegend': False,
                         'xaxis': 'x2',
-                        'offset': -2,
-                    'type': 'scatter',
-                    'mode': 'lines+text',
-                    'textposition': 'top left',
-                    'line': {
-                        'color': 'rgba(0,0,0,0)',
+                        'yaxis': 'y2',
+                    'width': 0.2,
+                    'offset': -0.27,
+                    'type': 'bar',
+                    'mode': 'text',
+                    'textposition': 'outside',
+                    'marker': {'color': 'rgba(0,0,0,0)'},
                     }
-                    }
+                # trace56 = {
+                #         'x': chart_1_trace_x,
+                #         'y': trace56_y,
+                #         'text': trace56_y,
+                #         'showlegend': False,
+                #         'xaxis': 'x2',
+                #     # 'type': 'scatter',
+                #     'mode': 'text',
+                #     'textposition': 'top left',
+                #     'line': {
+                #         'color': 'rgba(0,0,255,0)',
+                #     }
+                #     }
 
                 plot_value = {
-                    'data': [trace1, trace2, trace3, trace4, trace1234, trace5, trace6, trace56, trace9_y ],
+                    'data': [trace1234,trace1, trace2, trace3, trace4,  trace5, trace6, trace56, trace9_y ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'plot_bgcolor': 'rgba(255, 255, 255, 0)',
@@ -367,8 +389,19 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                'xaxis2': {'anchor': 'x2', },
 
                                'yaxis': {'fixedrange': True,
-                                         # 'range': [0, yrange]
+                                         'range': [0, yrange],
+                                         'showticklabels': False,
+                                         'showgrid': False,
+
                                          },
+                               'yaxis2': {
+                                         # 'anchor': 'y2',
+                                           'range': [0, yrange],
+                                           'showticklabels': False,
+                                           'barmode': 'group',
+                                   'showgrid': False,
+
+                               },
                                },
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
@@ -447,7 +480,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                # 'plot_bgcolor': 'rgb(255,255,255,0)',
                                'orientation': 'v',
-
+                               'showticklabels': False,
+                               'showgrid': False,
                                'showlegend': True,
                                'barmode': 'stack',
                                'legend': {'x': 1.2, 'y': 1, 'xanchor': 'right',
@@ -456,8 +490,10 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                           },
                                'xaxis': {'fixedrange': True, 'nticks': 10,},
                                'yaxis': {'fixedrange': True,
-                                         'range': [0, tank_range],
+                                         # 'range': [0, tank_range],
                                          'domain': [0, 1],},
+
+
                                },
                     'config': {'responsive': True, 'displayModeBar': False}
                 }
