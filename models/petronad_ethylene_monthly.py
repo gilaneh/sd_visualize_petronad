@@ -72,19 +72,33 @@ class SdVisualizePetronadCalculate(models.Model):
         month_production_5 = [rec for rec in productions if rec.data_date >= month_s_5 and rec.data_date <= month_e_5]
 
 
-        month_sum_feed = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['FEED'] and rec.amount < 0]))
-        month_sum_feed_h1 = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['HEAVY1'] and rec.amount < 0]))
-        month_sum_meg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['MEG'] and rec.amount > 0]))
-        month_sum_deg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['DEG'] and rec.amount > 0]))
-        month_sum_teg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['TEG'] and rec.amount > 0]))
-        month_sum_h1 = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['HEAVY1'] and rec.amount > 0]))
-        month_sum_h2 = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['HEAVY2'] and rec.amount > 0]))
+        month_sum_feed = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in ['FEED']
+                                   and rec.register_type == 'feed_usage']))
+        month_sum_feed_h1 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                      if rec.fluid.name in ['HEAVY1']
+                                      and rec.register_type == 'feed_usage']))
+        month_sum_meg = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                  if rec.fluid.name in ['MEG']
+                                  and rec.register_type == 'production']))
+        month_sum_deg = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                  if rec.fluid.name in ['DEG']
+                                  and rec.register_type == 'production']))
+        month_sum_teg = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                  if rec.fluid.name in ['TEG']
+                                  and rec.register_type == 'production']))
+        month_sum_h1 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                 if rec.fluid.name in ['HEAVY1']
+                                 and rec.register_type == 'production']))
+        month_sum_h2 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                 if rec.fluid.name in ['HEAVY2']
+                                 and rec.register_type == 'production']))
         month_productions_list = {'meg': [], 'deg': [], 'teg': [], }
         # date_week_day = list([month_s_0 + timedelta(days=i) for i in range(7)])
         # for rec_date in date_week_day:
-        #     day_meg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['MEG'] and rec.amount > 0 and rec.data_date == rec_date]))
-        #     day_deg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['DEG'] and rec.amount > 0 and rec.data_date == rec_date]))
-        #     day_teg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['TEG'] and rec.amount > 0 and rec.data_date == rec_date]))
+        #     day_meg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['MEG'] and rec.register_type == 'production' and rec.data_date == rec_date]))
+        #     day_deg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['DEG'] and rec.register_type == 'production' and rec.data_date == rec_date]))
+        #     day_teg = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['TEG'] and rec.register_type == 'production' and rec.data_date == rec_date]))
         #
         #     month_productions_list['meg'].append(day_meg)
         #     month_productions_list['deg'].append(day_deg)
@@ -94,9 +108,15 @@ class SdVisualizePetronadCalculate(models.Model):
         # month_sum_deg = sum(month_productions_list['deg'])
         # month_sum_teg = sum(month_productions_list['teg'])
 
-        month_sum_production_0 = sum(list([self.ton_amount(rec) for rec in month_production_0 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
-        month_sum_production_1 = sum(list([self.ton_amount(rec) for rec in month_production_1 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
-        month_sum_production_2 = sum(list([self.ton_amount(rec) for rec in month_production_2 if rec.fluid.name in ['MEG', 'DEG', 'TEG'] and rec.amount > 0]))
+        month_sum_production_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           and rec.register_type == 'production']))
+        month_sum_production_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           and rec.register_type == 'production']))
+        month_sum_production_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           and rec.register_type == 'production']))
 
 
         # month_sum_production_0 = sum(
