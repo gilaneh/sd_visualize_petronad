@@ -694,6 +694,8 @@ class SdVisualizePetronadCalculate(models.Model):
                     'textinfo': "label+value+percent",
                     'textposition': "outside",
                     # 'marker': {'color': 'rgb(180, 200, 230)'},
+                #     todo: fix colors for each type of shutdowns. It can be a record on the shutdown type record to be
+                #       selected by the user.
 
                 }
 
