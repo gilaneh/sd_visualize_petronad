@@ -171,7 +171,7 @@ class SdVisualizePetronadCalculate(models.Model):
                 trace1 = {
                     'x': three_weeks,
                     'y': week_sum_production_list,
-                    'text': week_sum_production_list,
+                    'text': [rec if rec > 0 else '' for rec in week_sum_production_list],
                     'name': 'Production',
                     'type': 'bar',
                     'marker': {
@@ -253,12 +253,14 @@ class SdVisualizePetronadCalculate(models.Model):
                 chart_2_y_2 = week_productions_list['deg']
                 chart_2_y_3 = week_productions_list['teg']
                 chart_2_y_total = list([chart_2_y_1[i] + chart_2_y_2[i] + chart_2_y_3[i] for i in range(7)])
-
+                max_range = max(chart_2_y_total)
+                yrange = int(max_range * 1.2)
 
                 trace1 = {
                     'x': week_days,
                     'y': chart_2_y_1,
-                    'text': chart_2_y_1,
+                    'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in chart_2_y_1],
+                    'textangle': 0,
                     'name': 'MEG',
                     'type': 'bar',
                     'textposition': 'top',
@@ -269,7 +271,8 @@ class SdVisualizePetronadCalculate(models.Model):
                 trace2 = {
                     'x': week_days,
                     'y': chart_2_y_2,
-                    'text': chart_2_y_2,
+                    'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in chart_2_y_2],
+                    'textangle': 0,
                     'name': 'DEG',
                     'type': 'bar',
                     'textposition': 'top',
@@ -280,7 +283,8 @@ class SdVisualizePetronadCalculate(models.Model):
                 trace3 = {
                     'x': week_days,
                     'y': chart_2_y_3,
-                    'text': chart_2_y_3,
+                    'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in chart_2_y_3],
+                    'textangle': 0,
                     'name': 'TEG',
                     'type': 'bar',
                     'textposition': 'top',
@@ -291,7 +295,7 @@ class SdVisualizePetronadCalculate(models.Model):
                 trace4 = {
                     'x': week_days,
                     'y': chart_2_y_total,
-                    'text': chart_2_y_total,
+                    'text': [rec if rec > 0 else '' for rec in chart_2_y_total],
                     'name': 'Total',
 
                     'type': 'scatter',
@@ -312,7 +316,8 @@ class SdVisualizePetronadCalculate(models.Model):
                                'yaxis': {
                                    # 'title': _('Production(tone)'),
                                    'fixedrange': True,
-                                   'range': [0, max(chart_2_y_total) * 1.2],
+                                   # 'range': [0, max(chart_2_y_total) * 1.2],
+                                   'range': [0, yrange],
 
                                },
                                'yaxis2': {

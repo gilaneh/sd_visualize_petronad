@@ -39,6 +39,8 @@ class SdVisualizePetronadCalculate(models.Model):
         value_model = self.env['sd_visualize.values']
         sorted_values = sorted(diagram.values, key=lambda val: val["sequence"])
         month_production_plan = 720
+        month_sale_plan = 720
+        month_work_hours = 720
         report_date = date.fromisoformat(update_date)
         # todo: report_date must be the latest date of the month. Mind the jalaali or gregorian calendar
 
@@ -56,6 +58,13 @@ class SdVisualizePetronadCalculate(models.Model):
         month_s_4, month_e_4 = self.month_start_end(this_date, -5, calendar)
         month_s_5, month_e_5 = self.month_start_end(this_date, -6, calendar)
 
+        month_no_0 = jdatetime.date.fromgregorian(date=month_s_0).month
+        month_no_1 = jdatetime.date.fromgregorian(date=month_s_1).month
+        month_no_2 = jdatetime.date.fromgregorian(date=month_s_2).month
+        month_name_fa = jdatetime.datetime.now().j_months_fa
+        report_year = jdatetime.datetime.now().year
+        three_months = [month_name_fa[month_no_2 - 1], month_name_fa[month_no_1 - 1], month_name_fa[month_no_0 - 1], ]
+
         # Production ##################################
         productions = self.env['km_petronad.production_record'].search([
                                                                  ('data_date', '>=', month_s_5),
@@ -72,9 +81,80 @@ class SdVisualizePetronadCalculate(models.Model):
         month_production_5 = [rec for rec in productions if rec.data_date >= month_s_5 and rec.data_date <= month_e_5]
 
 
-        month_sum_feed = sum(list([self.ton_amount(rec) for rec in month_production_0
+        month_sum_feed_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
                                    if rec.fluid.name in ['FEED']
                                    and rec.register_type == 'feed_usage']))
+        month_sum_feed_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in ['FEED']
+                                   and rec.register_type == 'feed_usage']))
+        month_sum_feed_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in ['FEED']
+                                   and rec.register_type == 'feed_usage']))
+
+        month_sum_meg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in ['MEG']
+                                   and rec.register_type == 'production']))
+        month_sum_meg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in ['MEG']
+                                   and rec.register_type == 'production']))
+        month_sum_meg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in ['MEG']
+                                   and rec.register_type == 'production']))
+
+        month_sum_deg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in ['DEG']
+                                   and rec.register_type == 'production']))
+        month_sum_deg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in ['DEG']
+                                   and rec.register_type == 'production']))
+        month_sum_deg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in ['DEG']
+                                   and rec.register_type == 'production']))
+
+        month_sum_teg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in ['TEG']
+                                   and rec.register_type == 'production']))
+        month_sum_teg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in ['TEG']
+                                   and rec.register_type == 'production']))
+        month_sum_teg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in ['TEG']
+                                   and rec.register_type == 'production']))
+
+
+
+        month_sum_sale_meg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in ['MEG']
+                                   and rec.register_type == 'sale']))
+        month_sum_sale_meg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in ['MEG']
+                                   and rec.register_type == 'sale']))
+        month_sum_sale_meg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in ['MEG']
+                                   and rec.register_type == 'sale']))
+
+        month_sum_sale_deg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in ['DEG']
+                                   and rec.register_type == 'sale']))
+        month_sum_sale_deg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in ['DEG']
+                                   and rec.register_type == 'sale']))
+        month_sum_sale_deg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in ['DEG']
+                                   and rec.register_type == 'sale']))
+
+        month_sum_sale_teg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in ['TEG']
+                                   and rec.register_type == 'sale']))
+        month_sum_sale_teg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in ['TEG']
+                                   and rec.register_type == 'sale']))
+        month_sum_sale_teg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in ['TEG']
+                                   and rec.register_type == 'sale']))
+
+
+
         month_sum_feed_h1 = sum(list([self.ton_amount(rec) for rec in month_production_0
                                       if rec.fluid.name in ['HEAVY1']
                                       and rec.register_type == 'feed_usage']))
@@ -93,6 +173,32 @@ class SdVisualizePetronadCalculate(models.Model):
         month_sum_h2 = sum(list([self.ton_amount(rec) for rec in month_production_0
                                  if rec.fluid.name in ['HEAVY2']
                                  and rec.register_type == 'production']))
+
+        # Shutdowns
+        shutdowns = self.env['km_petronad.shutdown'].search([
+                                                                 ('shutdown_date', '>=', month_s_2),
+                                                                 ('shutdown_date', '<=', month_e_0), ]
+                                                                ,order='shutdown_date desc', )
+
+
+        month_shutdown_0 = [rec for rec in shutdowns if rec.shutdown_date >= month_s_0 and rec.shutdown_date <= month_e_0]
+        month_shutdown_1 = [rec for rec in shutdowns if rec.shutdown_date >= month_s_1 and rec.shutdown_date <= month_e_1]
+        month_shutdown_2 = [rec for rec in shutdowns if rec.shutdown_date >= month_s_2 and rec.shutdown_date <= month_e_2]
+
+        month_shutdown_sum_0 = sum(list([rec.shutdown_time for rec in  month_shutdown_0]))
+        month_shutdown_sum_1 = sum(list([rec.shutdown_time for rec in  month_shutdown_1]))
+        month_shutdown_sum_2 = sum(list([rec.shutdown_time for rec in  month_shutdown_2]))
+
+        month_shutdown_type_0 = list([rec.shutdown_type for rec in  month_shutdown_0])
+        month_shutdown_types = []
+        for shutdown_type in month_shutdown_type_0:
+            shutdowns = list([rec.shutdown_time for rec in month_shutdown_0 if rec.shutdown_type == shutdown_type])
+            shutdown_hours = sum(shutdowns)
+            month_shutdown_types.append((shutdown_type.name, shutdown_hours ))
+
+
+
+
         month_productions_list = {'meg': [], 'deg': [], 'teg': [], }
         # date_week_day = list([month_s_0 + timedelta(days=i) for i in range(7)])
         # for rec_date in date_week_day:
@@ -117,6 +223,16 @@ class SdVisualizePetronadCalculate(models.Model):
         month_sum_production_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
                                            if rec.fluid.name in ['MEG', 'DEG', 'TEG']
                                            and rec.register_type == 'production']))
+        
+        month_sum_sale_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           and rec.register_type == 'sale']))
+        month_sum_sale_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           and rec.register_type == 'sale']))
+        month_sum_sale_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           and rec.register_type == 'sale']))
 
 
         # month_sum_production_0 = sum(
@@ -211,6 +327,9 @@ class SdVisualizePetronadCalculate(models.Model):
             elif rec.variable_name == 'report_date':
                 value = f'{self.convert_date(calendar, month_e_0)}  -  {self.convert_date(calendar, month_s_0)}'
 
+            elif rec.variable_name == 'month_name':
+                value = f'{month_name_fa[month_no_0 - 1]}  {report_year}'
+
             elif rec.variable_name == 'production_plan':
                 value = month_production_plan
 
@@ -218,7 +337,7 @@ class SdVisualizePetronadCalculate(models.Model):
                 value = self.float_num(month_sum_production_0, 2)
 
             elif rec.variable_name == 'month_sum_feed':
-                value = self.float_num(month_sum_feed, 2)
+                value = self.float_num(month_sum_feed_0, 2)
 
             elif rec.variable_name == 'month_sum_feed_h1':
                 value = self.float_num(month_sum_feed_h1, 2)
@@ -239,87 +358,375 @@ class SdVisualizePetronadCalculate(models.Model):
                 value = self.float_num(month_sum_h2, 2)
 
             elif rec.variable_name == 'chart_1':
-                monthe_no_0 = jdatetime.date.fromgregorian(date=month_s_0).month
-                monthe_no_1 = jdatetime.date.fromgregorian(date=month_s_1).month
-                monthe_no_2 = jdatetime.date.fromgregorian(date=month_s_2).month
-                month_name_fa = jdatetime.datetime.now().j_months_fa
-                three_months = [ month_name_fa[monthe_no_2 - 1],  month_name_fa[monthe_no_1 - 1],  month_name_fa[monthe_no_0 - 1], ]
 
 
-                month_sum_production_list = [ month_sum_production_2, month_sum_production_1, month_sum_production_0]
-                month_avr_production = self.float_num(sum(month_sum_production_list) / 6, 2)
+
+                trace1_y = [ month_sum_feed_2, month_sum_feed_1, month_sum_feed_0]
+                trace2_y = [ month_sum_meg_2, month_sum_meg_1, month_sum_meg_0]
+                trace3_y = [ month_sum_deg_2, month_sum_deg_1, month_sum_deg_0]
+                trace4_y = [ month_sum_teg_2, month_sum_teg_1, month_sum_teg_0]
+                trace234_y = [trace2_y[i] + trace3_y[i] + trace4_y[i] for i in range(3)]
+
+                max_range = max(trace1_y + trace234_y)
+                yrange = int(max_range * 1.2)
+                month_avr_production = self.float_num(sum(trace1_y) / len(trace1_y), 2)
                 performance_list = list(
                     map(lambda x: self.float_num(x * 100 / month_production_plan, 0) if month_production_plan else 0,
-                        month_sum_production_list))
+                        trace1_y))
                 trace1 = {
                     'x': three_months,
-                    'y': month_sum_production_list,
-                    'text': month_sum_production_list,
-                    'name': 'Production',
+                    'y': trace1_y,
+                    'text': [rec if rec > 0  else '' for rec in trace1_y],
+                    'textangle': 0,
+                    'name': 'Feed',
                     'type': 'bar',
-                    'marker': {
-                        'color': 'rgb(169,209,142)',
-                    },
+                    'width': .3,
+                    'offset': -0.2,
+
+                    'marker': {'color': 'rgb(110,50,160)'},
                     'textposition': 'outside',
 
                 }
                 trace2 = {
                     'x': three_months,
-                    'y': [month_production_plan, month_production_plan, month_production_plan, month_production_plan,
-                          month_production_plan, month_production_plan, ],
-                    'name': 'Plan',
-                    'mode': 'lines',
-                    'line': {
-                        'color': 'rgb(80,130,50)',
-                    },
+                    'y': trace2_y,
+                    'text': [rec if rec > 0 and rec > .1 * max_range else '' for rec in trace2_y],
+                    'textangle': 0,
+                    'width': .3,
+                    'offset': 0.2,
+                    'yaxis': 'y2',
+                    'name': 'MEG',
+                    'type': 'bar',
+                    'marker': {'color': 'rgb(30,80,120)'},
+
                 }
                 trace3 = {
                     'x': three_months,
-                    'y': [month_avr_production, month_avr_production, month_avr_production, month_avr_production,
-                          month_avr_production, month_avr_production, month_avr_production, ],
-                    'name': 'Average',
-                    'mode': 'lines',
+                    'y': trace3_y,
+                    'text': [rec if rec > 0 and rec > .1 * max_range else '' for rec in trace3_y],
+                    'textangle': 0,
+                    'width': .3,
+                    'offset': 0.2,
+                    'yaxis': 'y2',
+                    'name': 'DEG',
+                    'type': 'bar',
+                    'marker': {'color': 'rgb(0,110,200)'},
 
-                    'line': {
-                        'dash': 'dash',
-                        'width': 2,
-                        'color': 'rgb(80,130,50)',
-                    }
                 }
-                # trace4 = {
-                #     'x': six_months,
-                #     'y': performance_list,
-                #     'text': [1,2,3,4,5,6],
-                #     'name': _('Efficiency'),
-                #     'mode': 'lines',
-                #     'yaxis': 'y2',
-                #
-                #     'line': {
-                #         'dash': 'dot',
-                #         'width': 2,
-                #         'color': 'rgb(90,150,210)'
-                #     }
-                # }
+                trace4 = {
+                    'x': three_months,
+                    'y': trace4_y,
+                    'text': [rec if rec > 0 and rec > .1 * max_range else '' for rec in trace4_y],
+                    'textangle': 0,
+                    'width': .3,
+                    'offset': 0.2,
+                    'yaxis': 'y2',
+                    'name': 'TEG',
+                    'type': 'bar',
+                    'marker': {'color': 'rgb(160,200,230)'},
+
+                }
+                trace234 = {
+                    'x': three_months,
+                    'y': trace234_y,
+                    'text': [rec if rec > 0 else '' for rec in trace234_y],
+                    'textangle': 0,
+                    'showlegend': False,
+                    'width': .3,
+                    'offset': 0.2,
+                    'yaxis': 'y3',
+                    'name': 'TEG',
+                    'type': 'bar',
+                    'textposition': 'outside',
+                    'marker': {'color': 'rgba(0, 0, 0, 0)'},
+
+                }
+
+
                 plot_value = {
-                    'data': [trace1, trace2, trace3, ],
+                    'data': [trace1, trace2, trace3, trace4, trace234],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'plot_bgcolor': 'rgba(255, 255, 255, 0)',
                                'showlegend': True,
-                               'legend': {'x': 1.2, 'y': 1, 'xanchor': 'right',},
+                               'barmode': 'stack',
+                               'legend': {'x': 1.3, 'y': 1, 'xanchor': 'right',},
                                'xaxis': {'fixedrange': True},
-                               'yaxis': {
-                                   # 'title': _('Production(tone)'),
-                                   'fixedrange': True,
-                                   'range': [0, month_production_plan * 1.2],
+                               'yaxis1': {'anchor': 'y1',
+                                         'fixedrange': True,
+                                         'range': [0, yrange],
+                                         'barmode': 'group',
+
+                                         'showticklabels': False,
+                                         'showgrid': False,
+
+                                         },
+                               'yaxis2': {'anchor': 'y2',
+                                           'range': [0, yrange],
+                                           'showticklabels': False,
+                                           'barmode': 'stack',
+                                   'showgrid': False,
 
                                },
-                               'yaxis2': {
+                               'yaxis3': {'anchor': 'y3',
+                                           'range': [0, yrange],
+                                           'showticklabels': False,
+                                           'barmode': 'group',
+                                   'showgrid': False,
+
+                               },
+                               },
+                    'config': {'responsive': False, 'displayModeBar': False}
+                }
+                value = json.dumps(plot_value)
+
+
+            elif rec.variable_name == 'chart_2':
+                month_no_0 = jdatetime.date.fromgregorian(date=month_s_0).month
+                month_no_1 = jdatetime.date.fromgregorian(date=month_s_1).month
+                month_no_2 = jdatetime.date.fromgregorian(date=month_s_2).month
+                month_name_fa = jdatetime.datetime.now().j_months_fa
+                three_months = [ month_name_fa[month_no_2 - 1],  month_name_fa[month_no_1 - 1],  month_name_fa[month_no_0 - 1], ]
+
+                chart_2_trace1_y = [ month_sum_sale_meg_2, month_sum_sale_meg_1, month_sum_sale_meg_0]
+                chart_2_trace2_y = [ month_sum_sale_deg_2, month_sum_sale_deg_1, month_sum_sale_deg_0]
+                chart_2_trace3_y = [ month_sum_sale_teg_2, month_sum_sale_teg_1, month_sum_sale_teg_0]
+                chart_2_trace123_y = [chart_2_trace1_y[i] + chart_2_trace2_y[i] + chart_2_trace3_y[i] for i in range(3)]
+
+                chart_2_max_range = max(chart_2_trace123_y)
+                chart_2_yrange = int(chart_2_max_range * 1.2)
+
+
+                month_sum_sale_list = [ month_sum_sale_2, month_sum_sale_1, month_sum_sale_0]
+                month_avr_sale = self.float_num(sum(month_sum_sale_list) / 6, 2)
+                performance_list = list(
+                    map(lambda x: self.float_num(x * 100 / month_sale_plan, 0) if month_sale_plan else 0,
+                        month_sum_sale_list))
+                trace1 = {
+                    'x': three_months,
+                    'y': chart_2_trace1_y,
+                    'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace1_y],
+                    'textangle': 0,
+                    'textposition': 'inside',
+                    'name': 'MEG',
+                    'type': 'bar',
+                    'yaxis': 'y1',
+                    'marker': {'color': 'rgb(30,80,120)'},
+
+                }
+                trace2 = {
+                    'x': three_months,
+                    'y': chart_2_trace2_y,
+                    'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace2_y],
+                    'textangle': 0,
+                    'textposition': 'inside',
+
+                    'name': 'DEG',
+                    'type': 'bar',
+                    'yaxis': 'y1',
+                    'marker': {'color': 'rgb(0,110,200)'},
+                }
+                trace3 = {
+                    'x': three_months,
+                    'y': chart_2_trace3_y,
+                    'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace3_y],
+                    'textangle': 0,
+                    'textposition': 'inside',
+                    'name': 'TEG',
+                    'type': 'bar',
+                    'yaxis': 'y1',
+
+                    'marker': {'color': 'rgb(160,200,230)'},
+                }
+                trace123 = {
+                    'x': three_months,
+                    'y': chart_2_trace123_y,
+                    'text': [rec if rec > 0 else '' for rec in chart_2_trace123_y],
+                    'textangle': 0,
+                    'showlegend': False,
+                    'name': 'Sum',
+                    'type': 'bar',
+                    'yaxis': 'y2',
+                    'marker': {'color': 'rgba(0, 0, 0, 0)', },
+                    'textposition': 'outside',
+
+                }
+
+                plot_value = {
+                    'data': [trace1, trace2, trace3, trace123],
+                    'layout': {'autosize': False,
+                               'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'plot_bgcolor': 'rgba(255, 255, 255, 0)',
+                               'showlegend': True,
+                               'barmode': 'stack',
+                               'legend': {'x': 1.2, 'y': 1, 'xanchor': 'right',},
+                               'xaxis': {'fixedrange': True},
+                               'yaxis1': { 'anchor': 'y1',
+                                   # 'title': _('sale(tone)'),
+                                           'range': [0, chart_2_yrange],
+                                            'fixedrange': True,
+                                           'barmode': 'stack',
+                                           'showticklabels': False,
+                                           'showgrid': False,
+
+                                    },
+                               'yaxis2': {'anchor': 'y2',
                                    'overlaying': 'y',
                                    'side': 'right',
-                                   'range': [0, 100],
+                                   'range': [0, chart_2_yrange],
                                    'fixedrange': True,
-                                   'title': _('Efficiency(%)'),
-                               }
+                                    'barmode': 'group',
+                                          'showticklabels': False,
+                                          'showgrid': False,
+                                    }
+                               },
+                    'config': {'responsive': False, 'displayModeBar': False}
+                }
+                value = json.dumps(plot_value)
+
+            elif rec.variable_name == 'chart_3':
+                # month_shutdown_0
+                # month_shutdown_sum_0
+                # month_work_hours
+                chart_3_trace2_y = [ month_shutdown_sum_2, month_shutdown_sum_1, month_shutdown_sum_0]
+                chart_3_trace1_y = list([month_work_hours - rec for rec in chart_3_trace2_y])
+
+                month_avr_work = self.float_num(sum(chart_3_trace1_y) / len(chart_3_trace1_y), 2)
+                chart_3_trace3_y = [ month_avr_work, month_avr_work, month_avr_work]
+                chart_3_yrange = month_work_hours + 30
+                trace1 = {
+                    'x': three_months,
+                    'y': chart_3_trace1_y,
+                    'text': [rec if rec > 0  else '' for rec in chart_3_trace1_y],
+                    'textangle': 0,
+                    'textposition': 'inside',
+                    'name': 'Work',
+                    'type': 'bar',
+                    'width': .99,
+                    # 'yaxis': 'y1',
+                    'marker': {'color': 'rgb(180, 200, 230)'},
+
+                }
+                trace2 = {
+                    'x': three_months,
+                    'y': chart_3_trace2_y,
+                    'text': [rec if rec > 0  else '' for rec in chart_3_trace2_y],
+                    'textangle': 0,
+                    'textposition': 'outside',
+
+                    'name': 'Stop',
+                    'type': 'bar',
+                    'width': .99,
+                    # 'yaxis': 'y1',
+                    'marker': {'color': 'rgb(0,0,0)'},
+                }
+                trace3 = {
+                    'x': three_months,
+                    'y': chart_3_trace3_y,
+                    # 'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace3_y],
+
+                    'textangle': 0,
+                    'textposition': 'top',
+                    'name': 'Work Avr',
+                    'mode': 'lines',
+                    # 'yaxis': 'y1',
+                    'line':{
+                        'dash': 'dash',
+
+                    },
+
+                    'marker': {'color': 'rgb(160,200,230)'},
+                }
+
+
+                plot_value = {
+                    'data': [trace1, trace2, ],
+                    'layout': {'autosize': False,
+                               'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'plot_bgcolor': 'rgba(255, 255, 255, 0)',
+                               'showlegend': True,
+                               'barmode': 'stack',
+                               'legend': {'x': 1.3, 'y': 1, 'xanchor': 'right',},
+                               'xaxis': {'fixedrange': True},
+                               'yaxis1': { 'anchor': 'y1',
+                                   # 'title': _('sale(tone)'),
+                                           'range': [0, chart_3_yrange],
+                                            'fixedrange': True,
+                                           'barmode': 'stack',
+                                           'showticklabels': False,
+                                           'showgrid': False,
+
+                                    },
+                               'yaxis2': {'anchor': 'y2',
+                                   'overlaying': 'y',
+                                   'side': 'right',
+                                   'range': [0, chart_3_yrange],
+                                   'fixedrange': True,
+                                    'barmode': 'group',
+                                          'showticklabels': False,
+                                          'showgrid': False,
+                                    }
+                               },
+                    'config': {'responsive': False, 'displayModeBar': False}
+                }
+                value = json.dumps(plot_value)
+
+            elif rec.variable_name == 'chart_4':
+                # month_shutdown_0
+                # month_shutdown_sum_0
+                # month_work_hours
+                chart_3_trace2_y = [ month_shutdown_sum_2, month_shutdown_sum_1, month_shutdown_sum_0]
+                chart_3_trace1_y = list([month_work_hours - rec for rec in chart_3_trace2_y])
+
+                sh_values = []
+                sh_labels = []
+                for sh_rec in month_shutdown_types:
+                    sh_labels.append(sh_rec[0])
+                    sh_values.append(sh_rec[1])
+
+                month_avr_work = self.float_num(sum(chart_3_trace1_y) / len(chart_3_trace1_y), 2)
+                chart_3_trace3_y = [ month_avr_work, month_avr_work, month_avr_work]
+                chart_3_yrange = month_work_hours + 30
+                trace1 = {
+                    'values': sh_values,
+                    'labels': sh_labels,
+                    'type': 'pie',
+                    'textinfo': "label+value+percent",
+                    'textposition': "outside",
+                    # 'marker': {'color': 'rgb(180, 200, 230)'},
+
+                }
+
+
+                plot_value = {
+                    'data': [trace1, ],
+                    'layout': {'autosize': False,
+                               'margin': {"t": 0, "b": 0, "l": 0, "r": 0},
+
+                               'paper_bgcolor': 'rgb(255,255,255,0)',
+                               'plot_bgcolor': 'rgba(255, 255, 255, 0)',
+                               'showlegend': False,
+                               'barmode': 'stack',
+                               'legend': {'x': 1.3, 'y': 1, 'xanchor': 'right',},
+                               'xaxis': {'fixedrange': True},
+                               'yaxis1': { 'anchor': 'y1',
+                                   # 'title': _('sale(tone)'),
+                                           'range': [0, chart_3_yrange],
+                                            'fixedrange': True,
+                                           'barmode': 'stack',
+                                           'showticklabels': False,
+                                           'showgrid': False,
+
+                                    },
+                               'yaxis2': {'anchor': 'y2',
+                                   'overlaying': 'y',
+                                   'side': 'right',
+                                   'range': [0, chart_3_yrange],
+                                   'fixedrange': True,
+                                    'barmode': 'group',
+                                          'showticklabels': False,
+                                          'showgrid': False,
+                                    }
                                },
                     'config': {'responsive': False, 'displayModeBar': False}
                 }

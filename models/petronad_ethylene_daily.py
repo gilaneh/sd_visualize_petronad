@@ -245,17 +245,21 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace3_y = [teg_3, teg_2, teg_1 ]
                 trace4_y = [h1_3, h1_2, h1_1 ]
                 trace1234_y = [trace1_y[i] + trace2_y[i] + trace3_y[i] + trace4_y[i] for i in range(3)]
+
                 trace5_y = [feeds_3 , feeds_2, feeds_1 ]
                 trace6_y = [feed_h1_3, feed_h1_2, feed_h1_1 ]
                 trace56_y = [trace5_y[i] + trace6_y[i] for i in range(3)]
+
                 trace9_y = [30, 30, 30]
+
                 max_range = max(trace1234_y + trace56_y)
-                yrange = int(max_range * 1.2)
+                yrange = int(max_range * 1.3)
+
                 chart_1_trace_x = [s_start_date_3, s_start_date_2, s_start_date_1]
                 trace1 =  {
                         'x': chart_1_trace_x,
                         'y': trace1_y,
-                        'text': [rec if rec > .1 * max_range else '' for rec in trace1_y],
+                        'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in trace1_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -269,7 +273,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace2 = {
                         'x': chart_1_trace_x,
                         'y': trace2_y,
-                        'text': [rec if rec > .1 * max_range else '' for rec in trace2_y],
+                        'text': [rec if  rec != 0 and rec > .1 * max_range else '' for rec in trace2_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -282,7 +286,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace3 = {
                         'x': chart_1_trace_x,
                         'y': trace3_y,
-                        'text': [rec if rec > .1 * max_range else '' for rec in trace3_y],
+                        'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in trace3_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -295,7 +299,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace4 = {
                         'x': chart_1_trace_x,
                         'y': trace4_y,
-                        'text': [rec if rec > .1 * max_range else '' for rec in trace4_y],
+                        'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in trace4_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -308,7 +312,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace1234 = {
                         'x': chart_1_trace_x,
                         'y': trace1234_y ,
-                        'text': trace1234_y ,
+                        'text': [rec if rec > 0 else '' for rec in trace1234_y] ,
                         'showlegend': False,
                         # 'xaxis': 'x1',
                         'yaxis': 'y2',
@@ -323,7 +327,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace5 = {
                         'x': chart_1_trace_x,
                         'y': trace5_y,
-                        'text': [rec if rec > .1 * max_range else '' for rec in trace5_y],
+                        'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in trace5_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
@@ -331,12 +335,14 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                         'xaxis': 'x2',
                         'width': 0.2,
                         'offset': -0.27,
-                        'barmode': 'stack', 'marker': {'color': 'rgb(110,50,160)'},
+                        'barmode': 'stack',
+                    'marker': {'color': 'rgb(110,50,160)'},
                     }
                 trace6 = {
                         'x': chart_1_trace_x,
                         'y': trace6_y,
-                        'text': [rec if rec > .1 * max_range else '' for rec in trace6_y],
+                        # 'text': ['nan', 'nan', 'nan'],
+                        'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in trace6_y],
                     'textposition': 'top',
                     'textangle': 0,
                         'showlegend': False,
@@ -347,10 +353,11 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                         'offset': -0.27,
                         'barmode': 'stack', 'marker': {'color': 'rgb(200,90,20)'},
                     }
+
                 trace56 = {
                         'x': chart_1_trace_x,
                         'y': trace56_y,
-                        'text': trace56_y,
+                        'text': [rec if rec > 0 else '' for rec in trace56_y] ,
                         'showlegend': False,
                         'xaxis': 'x2',
                         'yaxis': 'y2',
@@ -491,7 +498,9 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                'xaxis': {'fixedrange': True, 'nticks': 10,},
                                'yaxis': {'fixedrange': True,
                                          # 'range': [0, tank_range],
-                                         'domain': [0, 1],},
+                                         'showticklabels': False,
+                                         # 'domain': [0, 1],
+                                         },
 
 
                                },
