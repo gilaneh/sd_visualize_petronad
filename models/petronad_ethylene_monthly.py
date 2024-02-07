@@ -61,8 +61,8 @@ class SdVisualizePetronadCalculate(models.Model):
         month_no_0 = jdatetime.date.fromgregorian(date=month_s_0).month
         month_no_1 = jdatetime.date.fromgregorian(date=month_s_1).month
         month_no_2 = jdatetime.date.fromgregorian(date=month_s_2).month
+        report_year = jdatetime.date.fromgregorian(date=month_s_0).strftime('%Y')
         month_name_fa = jdatetime.datetime.now().j_months_fa
-        report_year = jdatetime.datetime.now().year
         three_months = [month_name_fa[month_no_2 - 1], month_name_fa[month_no_1 - 1], month_name_fa[month_no_0 - 1], ]
 
         # Production ##################################
