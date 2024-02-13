@@ -177,7 +177,9 @@ class SdVisualizePetronadCalculate(models.Model):
         # Shutdowns
         shutdowns = self.env['km_petronad.shutdown'].search([
                                                                  ('shutdown_date', '>=', month_s_2),
-                                                                 ('shutdown_date', '<=', month_e_0), ]
+                                                                 ('shutdown_date', '<=', month_e_0),
+                                                                 ('fluid', 'in', ['MEG', 'DEG']),
+        ]
                                                                 ,order='shutdown_date desc', )
 
 
