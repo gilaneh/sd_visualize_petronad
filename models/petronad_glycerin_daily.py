@@ -107,7 +107,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             days=2) and rec.fluid.name == 'GLYCERIN Pitch' and rec.register_type == 'production'])))
 
         all_tanks = self.env['km_petronad.storage_tanks'].search([])
-        all_tanks = list([rec for rec in all_tanks if rec.fluid.name in ['FEED', 'MEG', 'DEG','TEG', 'HEAVY1', 'HEAVY2', ]])
+        all_tanks = list([rec for rec in all_tanks if rec.fluid.name in ['GLYCERIN', 'GLYCERIN CRUDE', 'GLYCERIN Pitch','GLYCERIN Industrial', 'GLYCERIN Pharma', ]])
 
 
         duration_pro = self.env['km_petronad.production_record'].search([('data_date', '>', report_date), ])
@@ -176,7 +176,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
-                        'name': "MEG",
+                        'name': "Glycerin Indu",
                         'xaxis': 'x1',
                         'width': 0.2,
                         'offset': 0.05,
@@ -190,7 +190,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
-                        'name': "DEG",
+                        'name': "Glycerin Phar",
                         'xaxis': 'x1',
                         'width': 0.2,
                         'offset': 0.05,
@@ -220,7 +220,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
-                        'name': "Feed",
+                        'name': "Glycerin Crude",
                         'xaxis': 'x2',
                         'width': 0.2,
                         'offset': -0.27,
