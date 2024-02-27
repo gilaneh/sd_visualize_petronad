@@ -106,27 +106,6 @@ class SdVisualizePetronadCalculate(models.Model):
                                    if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'production']))
 
-        month_sum_deg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                   if rec.fluid.name in ['DEG']
-                                   and rec.register_type == 'production']))
-        month_sum_deg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                   if rec.fluid.name in ['DEG']
-                                   and rec.register_type == 'production']))
-        month_sum_deg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                   if rec.fluid.name in ['DEG']
-                                   and rec.register_type == 'production']))
-
-        month_sum_teg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                   if rec.fluid.name in ['TEG']
-                                   and rec.register_type == 'production']))
-        month_sum_teg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                   if rec.fluid.name in ['TEG']
-                                   and rec.register_type == 'production']))
-        month_sum_teg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                   if rec.fluid.name in ['TEG']
-                                   and rec.register_type == 'production']))
-
-
 
         month_sum_sale_cly_industry_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
                                    if rec.fluid.name in GLY_Industial
@@ -138,52 +117,19 @@ class SdVisualizePetronadCalculate(models.Model):
                                    if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'sale']))
 
-        month_sum_sale_deg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                   if rec.fluid.name in ['DEG']
-                                   and rec.register_type == 'sale']))
-        month_sum_sale_deg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                   if rec.fluid.name in ['DEG']
-                                   and rec.register_type == 'sale']))
-        month_sum_sale_deg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                   if rec.fluid.name in ['DEG']
-                                   and rec.register_type == 'sale']))
-
-        month_sum_sale_teg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                   if rec.fluid.name in ['TEG']
-                                   and rec.register_type == 'sale']))
-        month_sum_sale_teg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                   if rec.fluid.name in ['TEG']
-                                   and rec.register_type == 'sale']))
-        month_sum_sale_teg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                   if rec.fluid.name in ['TEG']
-                                   and rec.register_type == 'sale']))
 
 
 
-        month_sum_feed_h1 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                      if rec.fluid.name in ['HEAVY1']
-                                      and rec.register_type == 'feed_usage']))
-        month_sum_meg = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                  if rec.fluid.name in ['MEG']
+        month_sum_cly_industry = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                  if rec.fluid.name in GLY_Industial
                                   and rec.register_type == 'production']))
-        month_sum_deg = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                  if rec.fluid.name in ['DEG']
-                                  and rec.register_type == 'production']))
-        month_sum_teg = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                  if rec.fluid.name in ['TEG']
-                                  and rec.register_type == 'production']))
-        month_sum_h1 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                 if rec.fluid.name in ['HEAVY1']
-                                 and rec.register_type == 'production']))
-        month_sum_h2 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                 if rec.fluid.name in ['HEAVY2']
-                                 and rec.register_type == 'production']))
+
 
         # Shutdowns
         shutdowns = self.env['km_petronad.shutdown'].search([
                                                                  ('shutdown_date', '>=', month_s_2),
                                                                  ('shutdown_date', '<=', month_e_0),
-                                                                 ('fluid', 'in', ['MEG', 'DEG']),
+                                                                 ('fluid', 'in', GLY_Industial + GLY_Pharma),
         ]
                                                                 ,order='shutdown_date desc', )
 
@@ -222,23 +168,23 @@ class SdVisualizePetronadCalculate(models.Model):
         # month_sum_teg = sum(month_productions_list['teg'])
 
         month_sum_production_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           if rec.fluid.name in GLY_Industial + GLY_Pharma
                                            and rec.register_type == 'production']))
         month_sum_production_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           if rec.fluid.name in GLY_Industial + GLY_Pharma
                                            and rec.register_type == 'production']))
         month_sum_production_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           if rec.fluid.name in GLY_Industial + GLY_Pharma
                                            and rec.register_type == 'production']))
         
         month_sum_sale_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           if rec.fluid.name in GLY_Industial + GLY_Pharma
                                            and rec.register_type == 'sale']))
         month_sum_sale_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           if rec.fluid.name in GLY_Industial + GLY_Pharma
                                            and rec.register_type == 'sale']))
         month_sum_sale_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                           if rec.fluid.name in ['MEG', 'DEG', 'TEG']
+                                           if rec.fluid.name in GLY_Industial + GLY_Pharma
                                            and rec.register_type == 'sale']))
 
 
@@ -346,23 +292,11 @@ class SdVisualizePetronadCalculate(models.Model):
             elif rec.variable_name == 'month_sum_feed':
                 value = self.float_num(month_sum_feed_0, 2)
 
-            elif rec.variable_name == 'month_sum_feed_h1':
-                value = self.float_num(month_sum_feed_h1, 2)
 
-            elif rec.variable_name == 'month_sum_meg':
-                value = self.float_num(month_sum_meg, 2)
+            elif rec.variable_name == 'month_sum_cly_industry':
+                value = self.float_num(month_sum_cly_industry, 2)
 
-            elif rec.variable_name == 'month_sum_deg':
-                value = self.float_num(month_sum_deg, 2)
 
-            elif rec.variable_name == 'month_sum_teg':
-                value = self.float_num(month_sum_teg, 2)
-
-            elif rec.variable_name == 'month_sum_h1':
-                value = self.float_num(month_sum_h1, 2)
-
-            elif rec.variable_name == 'month_sum_h2':
-                value = self.float_num(month_sum_h2, 2)
 
             elif rec.variable_name == 'chart_1':
 
@@ -370,9 +304,8 @@ class SdVisualizePetronadCalculate(models.Model):
 
                 trace1_y = [ month_sum_feed_2, month_sum_feed_1, month_sum_feed_0]
                 trace2_y = [ month_sum_cly_industry_2, month_sum_cly_industry_1, month_sum_cly_industry_0]
-                trace3_y = [ month_sum_deg_2, month_sum_deg_1, month_sum_deg_0]
-                trace4_y = [ month_sum_teg_2, month_sum_teg_1, month_sum_teg_0]
-                trace234_y = [trace2_y[i] + trace3_y[i] + trace4_y[i] for i in range(3)]
+
+                trace234_y = [trace2_y[i]  for i in range(3)]
 
                 max_range = max(trace1_y + trace234_y)
                 yrange = int(max_range * 1.2)
@@ -385,7 +318,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': trace1_y,
                     'text': [rec if rec > 0  else '' for rec in trace1_y],
                     'textangle': 0,
-                    'name': 'Feed',
+                    'name': 'Crude',
                     'type': 'bar',
                     'width': .3,
                     'offset': -0.2,
@@ -402,37 +335,13 @@ class SdVisualizePetronadCalculate(models.Model):
                     'width': .3,
                     'offset': 0.2,
                     'yaxis': 'y2',
-                    'name': 'MEG',
+                    'name': 'Industry',
                     'type': 'bar',
                     'marker': {'color': 'rgb(30,80,120)'},
 
                 }
-                trace3 = {
-                    'x': three_months,
-                    'y': trace3_y,
-                    'text': [rec if rec > 0 and rec > .1 * max_range else '' for rec in trace3_y],
-                    'textangle': 0,
-                    'width': .3,
-                    'offset': 0.2,
-                    'yaxis': 'y2',
-                    'name': 'DEG',
-                    'type': 'bar',
-                    'marker': {'color': 'rgb(0,110,200)'},
 
-                }
-                trace4 = {
-                    'x': three_months,
-                    'y': trace4_y,
-                    'text': [rec if rec > 0 and rec > .1 * max_range else '' for rec in trace4_y],
-                    'textangle': 0,
-                    'width': .3,
-                    'offset': 0.2,
-                    'yaxis': 'y2',
-                    'name': 'TEG',
-                    'type': 'bar',
-                    'marker': {'color': 'rgb(160,200,230)'},
 
-                }
                 trace234 = {
                     'x': three_months,
                     'y': trace234_y,
@@ -442,7 +351,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'width': .3,
                     'offset': 0.2,
                     'yaxis': 'y3',
-                    'name': 'TEG',
+                    'name': '',
                     'type': 'bar',
                     'textposition': 'outside',
                     'marker': {'color': 'rgba(0, 0, 0, 0)'},
@@ -451,7 +360,7 @@ class SdVisualizePetronadCalculate(models.Model):
 
 
                 plot_value = {
-                    'data': [trace1, trace2, trace3, trace4, trace234],
+                    'data': [trace1, trace2, trace234],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'plot_bgcolor': 'rgba(255, 255, 255, 0)',
@@ -496,9 +405,8 @@ class SdVisualizePetronadCalculate(models.Model):
                 three_months = [ month_name_fa[month_no_2 - 1],  month_name_fa[month_no_1 - 1],  month_name_fa[month_no_0 - 1], ]
 
                 chart_2_trace1_y = [ month_sum_sale_cly_industry_2, month_sum_sale_cly_industry_1, month_sum_sale_cly_industry_0]
-                chart_2_trace2_y = [ month_sum_sale_deg_2, month_sum_sale_deg_1, month_sum_sale_deg_0]
-                chart_2_trace3_y = [ month_sum_sale_teg_2, month_sum_sale_teg_1, month_sum_sale_teg_0]
-                chart_2_trace123_y = [chart_2_trace1_y[i] + chart_2_trace2_y[i] + chart_2_trace3_y[i] for i in range(3)]
+
+                chart_2_trace123_y = [chart_2_trace1_y[i]  for i in range(3)]
 
                 chart_2_max_range = max(chart_2_trace123_y)
                 chart_2_yrange = int(chart_2_max_range * 1.2)
@@ -515,36 +423,13 @@ class SdVisualizePetronadCalculate(models.Model):
                     'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace1_y],
                     'textangle': 0,
                     'textposition': 'inside',
-                    'name': 'MEG',
+                    'name': 'Industry',
                     'type': 'bar',
                     'yaxis': 'y1',
                     'marker': {'color': 'rgb(30,80,120)'},
 
                 }
-                trace2 = {
-                    'x': three_months,
-                    'y': chart_2_trace2_y,
-                    'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace2_y],
-                    'textangle': 0,
-                    'textposition': 'inside',
 
-                    'name': 'DEG',
-                    'type': 'bar',
-                    'yaxis': 'y1',
-                    'marker': {'color': 'rgb(0,110,200)'},
-                }
-                trace3 = {
-                    'x': three_months,
-                    'y': chart_2_trace3_y,
-                    'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace3_y],
-                    'textangle': 0,
-                    'textposition': 'inside',
-                    'name': 'TEG',
-                    'type': 'bar',
-                    'yaxis': 'y1',
-
-                    'marker': {'color': 'rgb(160,200,230)'},
-                }
                 trace123 = {
                     'x': three_months,
                     'y': chart_2_trace123_y,
@@ -560,7 +445,7 @@ class SdVisualizePetronadCalculate(models.Model):
                 }
 
                 plot_value = {
-                    'data': [trace1, trace2, trace3, trace123],
+                    'data': [trace1,  trace123],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'plot_bgcolor': 'rgba(255, 255, 255, 0)',

@@ -256,7 +256,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': chart_2_y_1,
                     'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in chart_2_y_1],
                     'textangle': 0,
-                    'name': 'MEG',
+                    'name': 'Pitch',
                     'type': 'bar',
                     'textposition': 'top',
                     'marker': {
@@ -268,7 +268,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': chart_2_y_2,
                     'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in chart_2_y_2],
                     'textangle': 0,
-                    'name': 'DEG',
+                    'name': 'Industry',
                     'type': 'bar',
                     'textposition': 'top',
                     'marker': {
@@ -280,7 +280,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': chart_2_y_3,
                     'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in chart_2_y_3],
                     'textangle': 0,
-                    'name': 'TEG',
+                    'name': 'Pharma',
                     'type': 'bar',
                     'textposition': 'top',
                     'marker': {
