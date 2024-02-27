@@ -38,6 +38,11 @@ class SdVisualizePetronadCalculate(models.Model):
         week_production_plan = 126
         report_date = date.fromisoformat(update_date)
 
+        GLY_Crude = ['GLYCERIN CRUDE']
+        GLY_Industial = ['GLYCERIN', 'GLYCERIN Industrial']
+        GLY_Pharma = ['GLYCERIN Pharma']
+        GLY_Pitch = ['GLYCERIN Pitch']
+
         # to fix selection of friday. This way it pretends it is selected wednesday.
         this_date = report_date - timedelta(days=2) if report_date.weekday() == 4 else report_date
 
@@ -69,7 +74,7 @@ class SdVisualizePetronadCalculate(models.Model):
         week_production_5 = [rec for rec in productions if rec.data_date >= week_s_5 and rec.data_date <= week_e_5]
 
         week_sum_feed = sum(list([self.ton_amount(rec) for rec in week_production_0
-                                  if rec.fluid.name in ['GLYCERIN CRUDE']
+                                  if rec.fluid.name in GLY_Crude
                                   and rec.register_type == 'feed_usage']))
         # week_sum_feed_h1 = sum(list([self.ton_amount(rec) for rec in week_production_0
         #                              if rec.fluid.name in ['HEAVY1']
@@ -78,15 +83,15 @@ class SdVisualizePetronadCalculate(models.Model):
         date_week_day = list([week_s_0 + timedelta(days=i) for i in range(7)])
         for rec_date in date_week_day:
             day_glycerin_pitch = sum(list([self.ton_amount(rec) for rec in week_production_0
-                                if rec.fluid.name in ['GLYCERIN Pitch']
+                                if rec.fluid.name in GLY_Pitch
                                 and rec.register_type == 'production'
                                 and rec.data_date == rec_date]))
             day_glycerin_i = sum(list([self.ton_amount(rec) for rec in week_production_0
-                                if rec.fluid.name in ['GLYCERIN Industrial']
+                                if rec.fluid.name in GLY_Industial
                                 and rec.register_type == 'production'
                                 and rec.data_date == rec_date]))
             day_glycerin_p = sum(list([self.ton_amount(rec) for rec in week_production_0
-                                if rec.fluid.name in ['GLYCERIN Pharma']
+                                if rec.fluid.name in GLY_Pharma
                                 and rec.register_type == 'production'
                                 and rec.data_date == rec_date]))
             week_productions_list['day_glycerin_pitch'].append(day_glycerin_pitch)
@@ -99,13 +104,13 @@ class SdVisualizePetronadCalculate(models.Model):
 
         week_sum_production_0 = sum(list([self.ton_amount(rec) for rec in week_production_0
                                           if rec.fluid.name
-                                          in ['day_glycerin_pitch', 'day_glycerin_i', 'day_glycerin_p']
+                                          in GLY_Industial + GLY_Pharma
                                           and rec.register_type == 'production']))
         week_sum_production_1 = sum(list([self.ton_amount(rec) for rec in week_production_1
-                                          if rec.fluid.name in ['day_glycerin_pitch', 'day_glycerin_i', 'day_glycerin_p']
+                                          if rec.fluid.name in GLY_Industial + GLY_Pharma
                                           and rec.register_type == 'production' ]))
         week_sum_production_2 = sum(list([self.ton_amount(rec) for rec in week_production_2
-                                          if rec.fluid.name in ['day_glycerin_pitch', 'day_glycerin_i', 'day_glycerin_p']
+                                          if rec.fluid.name in GLY_Industial + GLY_Pharma
                                           and rec.register_type == 'production']))
 
 
@@ -137,6 +142,13 @@ class SdVisualizePetronadCalculate(models.Model):
 
             elif rec.variable_name == 'week_sum_production':
                 value = week_sum_production_0
+
+            elif rec.variable_name == 'week_sum_glycerin_i':
+                value = week_sum_glycerin_i
+            elif rec.variable_name == 'week_sum_glycerin_p':
+                value = week_sum_glycerin_p
+            elif rec.variable_name == 'week_sum_glycerin_pitch':
+                value = week_sum_glycerin_pitch
 
             elif rec.variable_name == 'chart_1':
                 week_no_0 = jdatetime.date.fromgregorian(date=week_s_0).weeknumber()
@@ -231,9 +243,9 @@ class SdVisualizePetronadCalculate(models.Model):
 
                 week_days = [ week_day(week_s_0, i)  for i in range(7)]
 
-                chart_2_y_1 = week_productions_list['meg']
-                chart_2_y_2 = week_productions_list['deg']
-                chart_2_y_3 = week_productions_list['teg']
+                chart_2_y_1 = week_productions_list['day_glycerin_pitch']
+                chart_2_y_2 = week_productions_list['day_glycerin_i']
+                chart_2_y_3 = week_productions_list['day_glycerin_p']
                 chart_2_y_total = list([chart_2_y_1[i] + chart_2_y_2[i] + chart_2_y_3[i] for i in range(7)])
                 max_range = max(chart_2_y_total)
                 yrange = int(max_range * 1.2)

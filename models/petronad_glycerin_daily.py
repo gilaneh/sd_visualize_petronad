@@ -43,6 +43,9 @@ class SdVisualizePetronadCalculateDaily(models.Model):
         report_date = date.fromisoformat(update_date)
         productions = self.env['km_petronad.production_record'].search([('data_date', '<=', report_date),
                                                                         ('data_date', '>=', report_date - timedelta(days=2)), ])
+        GLY_Industial = ['GLYCERIN', 'GLYCERIN Industrial']
+        GLY_Pharma = ['GLYCERIN Pharma']
+        GLY_Pitch = ['GLYCERIN Pitch']
         # if len(productions) == 0:
         #     raise ValidationError(f'Production not found')
 
@@ -85,26 +88,27 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                 and rec.fluid.name == 'GLYCERIN CRUDE'
                                 and rec.register_type == 'feed_usage'])))
 
+
         glycerin_i_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                              rec.data_date == report_date and rec.fluid.name == 'GLYCERIN Industrial' and rec.register_type == 'production'])))
+                              rec.data_date == report_date and rec.fluid.name in GLY_Industial and rec.register_type == 'production'])))
         glycerin_i_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'GLYCERIN Industrial' and rec.register_type == 'production'])))
+            days=1) and rec.fluid.name in GLY_Industial and rec.register_type == 'production'])))
         glycerin_i_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'GLYCERIN Industrial' and rec.register_type == 'production'])))
+            days=2) and rec.fluid.name in GLY_Industial and rec.register_type == 'production'])))
 
         glycerin_p_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                              rec.data_date == report_date and rec.fluid.name == 'GLYCERIN Pharma' and rec.register_type == 'production'])))
+                              rec.data_date == report_date and rec.fluid.name in GLY_Pharma and rec.register_type == 'production'])))
         glycerin_p_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'GLYCERIN Pharma' and rec.register_type == 'production'])))
+            days=1) and rec.fluid.name in GLY_Pharma and rec.register_type == 'production'])))
         glycerin_p_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'GLYCERIN Pharma' and rec.register_type == 'production'])))
+            days=2) and rec.fluid.name in GLY_Pharma and rec.register_type == 'production'])))
 
         glycerin_pitch_1 = abs(sum(list([self.ton_amount(rec) for rec in productions if
-                              rec.data_date == report_date and rec.fluid.name == 'GLYCERIN Pitch' and rec.register_type == 'production'])))
+                              rec.data_date == report_date and rec.fluid.name in GLY_Pitch and rec.register_type == 'production'])))
         glycerin_pitch_2 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=1) and rec.fluid.name == 'GLYCERIN Pitch' and rec.register_type == 'production'])))
+            days=1) and rec.fluid.name in GLY_Pitch and rec.register_type == 'production'])))
         glycerin_pitch_3 = abs(sum(list([self.ton_amount(rec) for rec in productions if rec.data_date == report_date - timedelta(
-            days=2) and rec.fluid.name == 'GLYCERIN Pitch' and rec.register_type == 'production'])))
+            days=2) and rec.fluid.name in GLY_Pitch and rec.register_type == 'production'])))
 
         all_tanks = self.env['km_petronad.storage_tanks'].search([])
         all_tanks = list([rec for rec in all_tanks if rec.fluid.name in ['GLYCERIN', 'GLYCERIN CRUDE', 'GLYCERIN Pitch','GLYCERIN Industrial', 'GLYCERIN Pharma', ]])
@@ -156,8 +160,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
 
 
             elif rec.variable_name == 'chart_1':
-                trace1_y = [glycerin_i_1, glycerin_i_1, glycerin_i_1 ]
-                trace2_y = [glycerin_p_1, glycerin_p_1, glycerin_p_1 ]
+                trace1_y = [glycerin_i_3, glycerin_i_2, glycerin_i_1 ]
+                trace2_y = [glycerin_p_3, glycerin_p_2, glycerin_p_1 ]
                 trace12_y = [trace1_y[i] + trace2_y[i] for i in range(3)]
 
                 trace5_y = [glycerin_crude_3 , glycerin_crude_2, glycerin_crude_1 ]
