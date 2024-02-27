@@ -39,7 +39,8 @@ class SdVisualizePetronadCalculate(models.Model):
         report_date = date.fromisoformat(update_date)
 
         # to fix selection of friday. This way it pretends it is selected wednesday.
-        this_date = report_date - timedelta(days=2) if report_date.weekday() == 4 else report_date
+        # this_date = report_date - timedelta(days=2) if report_date.weekday() == 4 else report_date
+        this_date = report_date
 
         week_e_0 = this_date + relativedelta(weekday=FR(-1))
         week_s_0 = week_e_0 + relativedelta(weekday=SA(-1))

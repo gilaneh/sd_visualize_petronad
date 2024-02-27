@@ -51,12 +51,12 @@ class SdVisualizePetronadCalculate(models.Model):
         #     raise ValidationError(f'Production not found')
 
         this_date = report_date
-        month_s_0, month_e_0 = self.month_start_end(this_date, -1, calendar)
-        month_s_1, month_e_1 = self.month_start_end(this_date, -2, calendar)
-        month_s_2, month_e_2 = self.month_start_end(this_date, -3, calendar)
-        month_s_3, month_e_3 = self.month_start_end(this_date, -4, calendar)
-        month_s_4, month_e_4 = self.month_start_end(this_date, -5, calendar)
-        month_s_5, month_e_5 = self.month_start_end(this_date, -6, calendar)
+        month_s_0, month_e_0 = self.month_start_end(this_date, 0, calendar)
+        month_s_1, month_e_1 = self.month_start_end(this_date, -1, calendar)
+        month_s_2, month_e_2 = self.month_start_end(this_date, -2, calendar)
+        month_s_3, month_e_3 = self.month_start_end(this_date, -3, calendar)
+        month_s_4, month_e_4 = self.month_start_end(this_date, -4, calendar)
+        month_s_5, month_e_5 = self.month_start_end(this_date, -5, calendar)
 
         month_no_0 = jdatetime.date.fromgregorian(date=month_s_0).month
         month_no_1 = jdatetime.date.fromgregorian(date=month_s_1).month

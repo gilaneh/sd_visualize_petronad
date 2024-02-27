@@ -44,6 +44,11 @@ class SdVisualizePetronadCalculate(models.Model):
         report_date = date.fromisoformat(update_date)
         # todo: report_date must be the latest date of the month. Mind the jalaali or gregorian calendar
 
+
+        GLY_Crude = ['GLYCERIN CRUDE']
+        GLY_Industial = ['GLYCERIN', 'GLYCERIN Industrial']
+        GLY_Pharma = ['GLYCERIN Pharma']
+        GLY_Pitch = ['GLYCERIN Pitch']
         # production = self.env['km_petronad.production_record'].search([
         #                                                         ('data_date', '<=', report_date),]
         #                                                        , order='data_date desc', limit=1,)
@@ -51,12 +56,12 @@ class SdVisualizePetronadCalculate(models.Model):
         #     raise ValidationError(f'Production not found')
 
         this_date = report_date
-        month_s_0, month_e_0 = self.month_start_end(this_date, -1, calendar)
-        month_s_1, month_e_1 = self.month_start_end(this_date, -2, calendar)
-        month_s_2, month_e_2 = self.month_start_end(this_date, -3, calendar)
-        month_s_3, month_e_3 = self.month_start_end(this_date, -4, calendar)
-        month_s_4, month_e_4 = self.month_start_end(this_date, -5, calendar)
-        month_s_5, month_e_5 = self.month_start_end(this_date, -6, calendar)
+        month_s_0, month_e_0 = self.month_start_end(this_date, 0, calendar)
+        month_s_1, month_e_1 = self.month_start_end(this_date, -1, calendar)
+        month_s_2, month_e_2 = self.month_start_end(this_date, -2, calendar)
+        month_s_3, month_e_3 = self.month_start_end(this_date, -3, calendar)
+        month_s_4, month_e_4 = self.month_start_end(this_date, -4, calendar)
+        month_s_5, month_e_5 = self.month_start_end(this_date, -5, calendar)
 
         month_no_0 = jdatetime.date.fromgregorian(date=month_s_0).month
         month_no_1 = jdatetime.date.fromgregorian(date=month_s_1).month
@@ -82,23 +87,23 @@ class SdVisualizePetronadCalculate(models.Model):
 
 
         month_sum_feed_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                   if rec.fluid.name in ['FEED']
+                                   if rec.fluid.name in GLY_Crude
                                    and rec.register_type == 'feed_usage']))
         month_sum_feed_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                   if rec.fluid.name in ['FEED']
+                                   if rec.fluid.name in GLY_Crude
                                    and rec.register_type == 'feed_usage']))
         month_sum_feed_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                   if rec.fluid.name in ['FEED']
+                                   if rec.fluid.name in GLY_Crude
                                    and rec.register_type == 'feed_usage']))
 
-        month_sum_meg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                   if rec.fluid.name in ['MEG']
+        month_sum_cly_industry_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'production']))
-        month_sum_meg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                   if rec.fluid.name in ['MEG']
+        month_sum_cly_industry_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'production']))
-        month_sum_meg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                   if rec.fluid.name in ['MEG']
+        month_sum_cly_industry_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'production']))
 
         month_sum_deg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
@@ -123,14 +128,14 @@ class SdVisualizePetronadCalculate(models.Model):
 
 
 
-        month_sum_sale_meg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
-                                   if rec.fluid.name in ['MEG']
+        month_sum_sale_cly_industry_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'sale']))
-        month_sum_sale_meg_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
-                                   if rec.fluid.name in ['MEG']
+        month_sum_sale_cly_industry_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'sale']))
-        month_sum_sale_meg_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
-                                   if rec.fluid.name in ['MEG']
+        month_sum_sale_cly_industry_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'sale']))
 
         month_sum_sale_deg_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
@@ -364,7 +369,7 @@ class SdVisualizePetronadCalculate(models.Model):
 
 
                 trace1_y = [ month_sum_feed_2, month_sum_feed_1, month_sum_feed_0]
-                trace2_y = [ month_sum_meg_2, month_sum_meg_1, month_sum_meg_0]
+                trace2_y = [ month_sum_cly_industry_2, month_sum_cly_industry_1, month_sum_cly_industry_0]
                 trace3_y = [ month_sum_deg_2, month_sum_deg_1, month_sum_deg_0]
                 trace4_y = [ month_sum_teg_2, month_sum_teg_1, month_sum_teg_0]
                 trace234_y = [trace2_y[i] + trace3_y[i] + trace4_y[i] for i in range(3)]
@@ -490,7 +495,7 @@ class SdVisualizePetronadCalculate(models.Model):
                 month_name_fa = jdatetime.datetime.now().j_months_fa
                 three_months = [ month_name_fa[month_no_2 - 1],  month_name_fa[month_no_1 - 1],  month_name_fa[month_no_0 - 1], ]
 
-                chart_2_trace1_y = [ month_sum_sale_meg_2, month_sum_sale_meg_1, month_sum_sale_meg_0]
+                chart_2_trace1_y = [ month_sum_sale_cly_industry_2, month_sum_sale_cly_industry_1, month_sum_sale_cly_industry_0]
                 chart_2_trace2_y = [ month_sum_sale_deg_2, month_sum_sale_deg_1, month_sum_sale_deg_0]
                 chart_2_trace3_y = [ month_sum_sale_teg_2, month_sum_sale_teg_1, month_sum_sale_teg_0]
                 chart_2_trace123_y = [chart_2_trace1_y[i] + chart_2_trace2_y[i] + chart_2_trace3_y[i] for i in range(3)]
