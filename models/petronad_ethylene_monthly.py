@@ -595,7 +595,7 @@ class SdVisualizePetronadCalculate(models.Model):
 
                 month_avr_work = self.float_num(sum(chart_3_trace1_y) / len(chart_3_trace1_y), 2)
                 chart_3_trace3_y = [ month_avr_work, month_avr_work, month_avr_work]
-                chart_3_yrange = month_work_hours + 30
+                chart_3_yrange = month_work_hours * 1.1
                 trace1 = {
                     'x': three_months,
                     'y': chart_3_trace1_y,
@@ -646,6 +646,8 @@ class SdVisualizePetronadCalculate(models.Model):
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'plot_bgcolor': 'rgba(255, 255, 255, 0)',
+                               'margin': {"t": 0, "b": 50, "l": 0, "r": 0},
+
                                'showlegend': True,
                                'barmode': 'stack',
                                'legend': {'x': 1.3, 'y': 1, 'xanchor': 'right',},
