@@ -124,13 +124,13 @@ class SdVisualizePetronadCalculate(models.Model):
             elif rec.variable_name == 'test':
                 value = f'{week_productions_list} '
             elif rec.variable_name == 'week_days':
-                # value = f'{self.convert_date(calendar, week_e_0)}  -  {self.convert_date(calendar, week_s_0)}'
-                value = f'''
-                    <div class="d-flex flex-column align-items-end">
-                        <div>{self.convert_date(calendar, week_s_0)}</div>
-                        <div>{self.convert_date(calendar, week_e_0)}</div>
-                    </div>
-                        '''
+                value = f'{self.convert_date(calendar, week_e_0)}  -  {self.convert_date(calendar, week_s_0)}'
+                # value = f'''
+                #     <div class="d-flex flex-column align-items-end">
+                #         <div>{self.convert_date(calendar, week_s_0)}</div>
+                #         <div>{self.convert_date(calendar, week_e_0)}</div>
+                #     </div>
+                #         '''
             elif rec.variable_name == 'week_no':
                 value = jdatetime.date.fromgregorian(date=week_s_0).weeknumber()
             elif rec.variable_name == 'year':
