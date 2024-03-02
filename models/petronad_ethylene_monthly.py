@@ -705,7 +705,7 @@ class SdVisualizePetronadCalculate(models.Model):
                 plot_value = {
                     'data': [trace1, ],
                     'layout': {'autosize': False,
-                               'margin': {"t": 0, "b": 0, "l": 0, "r": 0},
+                               'margin': {"t": 60, "b": 60, "l": 60, "r": 60},
 
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'plot_bgcolor': 'rgba(255, 255, 255, 0)',
