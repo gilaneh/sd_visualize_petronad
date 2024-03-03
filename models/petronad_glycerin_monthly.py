@@ -536,7 +536,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'textposition': 'top left',
                     'textangle': 'horizontal',
                     'hoverinfo': 'none',
-                    'name': 'Sum of Hours',
+                    'name': 'Sum',
                     'mode': 'text',
                     'width': .99,
                     'textfont': {
