@@ -490,19 +490,25 @@ class SdVisualizePetronadCalculate(models.Model):
                 # month_shutdown_sum_0
                 # month_work_hours
                 chart_3_trace2_y = [ month_shutdown_sum_2, month_shutdown_sum_1, month_shutdown_sum_0]
+
                 chart_3_trace1_y = [0, 0, 0]
                 chart_3_trace1_y[2] = month_days_0 * 24 - chart_3_trace2_y[2]
                 chart_3_trace1_y[1] = month_days_1 * 24 - chart_3_trace2_y[1]
                 chart_3_trace1_y[0] = month_days_2 * 24 - chart_3_trace2_y[0]
+
+                chart_3_trace3_y = [0, 0, 0]
+                chart_3_trace3_y[2] = month_days_0 * 24
+                chart_3_trace3_y[1] = month_days_1 * 24
+                chart_3_trace3_y[0] = month_days_2 * 24
                 month_avr_work = self.float_num(sum(chart_3_trace1_y) / len(chart_3_trace1_y), 2)
-                chart_3_trace3_y = [ month_avr_work, month_avr_work, month_avr_work]
-                chart_3_yrange = month_work_hours * 1.1
+                # chart_3_trace3_y = [ month_avr_work, month_avr_work, month_avr_work]
+                chart_3_yrange = month_work_hours * 1.2
                 trace1 = {
                     'x': three_months,
                     'y': chart_3_trace1_y,
                     'text': [rec if rec > 0  else '' for rec in chart_3_trace1_y],
                     'textangle': 0,
-                    'textposition': 'inside',
+                    # 'textposition': 'inside',
                     'name': 'Work',
                     'type': 'bar',
                     'width': .99,
@@ -515,7 +521,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': chart_3_trace2_y,
                     'text': [rec if rec > 0  else '' for rec in chart_3_trace2_y],
                     'textangle': 0,
-                    'textposition': 'outside',
+                    # 'textposition': 'inside',
 
                     'name': 'Stop',
                     'type': 'bar',
@@ -526,24 +532,23 @@ class SdVisualizePetronadCalculate(models.Model):
                 trace3 = {
                     'x': three_months,
                     'y': chart_3_trace3_y,
-                    # 'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace3_y],
+                    'text': [f'{rec}     ' for rec in chart_3_trace3_y],
+                    'textposition': 'top left',
+                    'textangle': 'horizontal',
+                    'hoverinfo': 'none',
+                    'name': 'Sum of Hours',
+                    'mode': 'text',
+                    'width': .99,
+                    'textfont': {
+                        'color': "#1f77b4",
+                        'size': 22,
+                    }
 
-                    'textangle': 0,
-                    'textposition': 'top',
-                    'name': 'Work Avr',
-                    'mode': 'lines',
-                    # 'yaxis': 'y1',
-                    'line':{
-                        'dash': 'dash',
-
-                    },
-
-                    'marker': {'color': 'rgb(160,200,230)'},
                 }
 
 
                 plot_value = {
-                    'data': [trace1, trace2, ],
+                    'data': [trace1, trace2, trace3, ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'plot_bgcolor': 'rgba(255, 255, 255, 0)',
