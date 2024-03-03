@@ -521,7 +521,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': chart_3_trace2_y,
                     'text': [rec if rec > 0  else '' for rec in chart_3_trace2_y],
                     'textangle': 0,
-                    # 'textposition': 'inside',
+                    'textposition': 'outside',
 
                     'name': 'Stop',
                     'type': 'bar',
