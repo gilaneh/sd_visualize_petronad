@@ -58,6 +58,13 @@ class SdVisualizePetronadCalculate(models.Model):
         month_s_4, month_e_4 = self.month_start_end(this_date, -4, calendar)
         month_s_5, month_e_5 = self.month_start_end(this_date, -5, calendar)
 
+        month_days_0 = ((date.today() if date.today() < month_e_0 else month_e_0) - month_s_0).days + 1
+        month_days_0 = month_days_0 if month_days_0 > 0 else 0
+        month_days_1 = ((date.today() if date.today() < month_e_1 else month_e_1) - month_s_1).days + 1
+        month_days_1 = month_days_1 if month_days_1 > 0 else 0
+        month_days_2 = ((date.today() if date.today() < month_e_2 else month_e_2) - month_s_2).days + 1
+        month_days_2 = month_days_2 if month_days_2 > 0 else 0
+
         month_no_0 = jdatetime.date.fromgregorian(date=month_s_0).month
         month_no_1 = jdatetime.date.fromgregorian(date=month_s_1).month
         month_no_2 = jdatetime.date.fromgregorian(date=month_s_2).month
@@ -591,8 +598,10 @@ class SdVisualizePetronadCalculate(models.Model):
                 # month_shutdown_sum_0
                 # month_work_hours
                 chart_3_trace2_y = [ month_shutdown_sum_2, month_shutdown_sum_1, month_shutdown_sum_0]
-                chart_3_trace1_y = list([month_work_hours - rec for rec in chart_3_trace2_y])
-
+                chart_3_trace1_y = [0, 0, 0]
+                chart_3_trace1_y[2] = month_days_0 * 24 - chart_3_trace2_y[2]
+                chart_3_trace1_y[1] = month_days_1 * 24 - chart_3_trace2_y[1]
+                chart_3_trace1_y[0] = month_days_2 * 24 - chart_3_trace2_y[0]
                 month_avr_work = self.float_num(sum(chart_3_trace1_y) / len(chart_3_trace1_y), 2)
                 chart_3_trace3_y = [ month_avr_work, month_avr_work, month_avr_work]
                 chart_3_yrange = month_work_hours * 1.1
