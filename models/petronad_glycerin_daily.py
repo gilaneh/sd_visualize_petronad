@@ -300,6 +300,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 chart_2_trace_1 = tank_amounts
                 chart_2_trace_2 = tank_empty
                 chart_2_trace_3 = tank_capacity
+
                 tank_range = int(max(tank_capacity) * 1.1)
 
                 def text_position(a, m=max(tank_capacity)):
@@ -320,7 +321,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'x': chart_2_trace_x,
                     'y': chart_2_trace_1,
                     'text': text_p,
-                    'textposition': 'top outside',
+                    'textposition': 'outside right',
                     'hoverinfo': 'none',
                     'textangle': 0,
                     # 'textfont': {'size': [30, 1,10,10,10,10,10]},
@@ -336,8 +337,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'x': chart_2_trace_x,
                     'y': chart_2_trace_2,
                     'text': chart_2_trace_2,
-                    'textposition': 'inside',
-                    'textangle': 'horizontal',
+                    'textposition': 'outside right',
+                    'textangle': 0,
                     'hoverinfo': 'none',
                     'name': 'باقی مانده',
                     'type': 'bar',
@@ -349,9 +350,9 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 trace3 = {
                     'x': chart_2_trace_x,
                     'y': chart_2_trace_3,
-                    'text': chart_2_trace_3,
-                    'textposition': 'top',
-                    'textangle': 'horizontal',
+                    'text': list([f'{rec}     ' for rec in chart_2_trace_3]),
+                    'textposition': 'top left',
+                    'textangle': 0,
                     'hoverinfo': 'none',
                     'name': 'ظرفیت',
                     # 'type': 'bar',
@@ -360,6 +361,10 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                         'size': 26,
                         'offset': .2,
                     },
+                    'textfont': {
+                        'color': "#1f77b4",
+                        # 'size': 20,
+                    }
                 }
                 plot_value = {
                     'data': [trace1, trace2, trace3, ],

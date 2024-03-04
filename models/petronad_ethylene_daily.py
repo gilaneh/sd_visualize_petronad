@@ -461,7 +461,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'y': chart_2_trace_2,
                     'text': chart_2_trace_2,
                     'textposition': 'inside',
-                    'textangle': 'horizontal',
+                    'textangle': '0',
                     'hoverinfo': 'none',
                     'name': 'باقی مانده',
                     'type': 'bar',
@@ -497,7 +497,8 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                                'barmode': 'stack',
                                'legend': {'x': 1.2, 'y': 1, 'xanchor': 'right',
                                           'bgcolor': 'rgba(255, 255, 255, 0)',
-                                          'bordercolor': 'rgba(255, 255, 255, 0)'
+                                          'bordercolor': 'rgba(255, 255, 255, 0)',
+                                          # 'orientation': 'h',
                                           },
                                'xaxis': {'fixedrange': True, 'nticks': 10,},
                                'yaxis': {'fixedrange': True,
