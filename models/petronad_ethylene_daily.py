@@ -136,9 +136,13 @@ class SdVisualizePetronadCalculateDaily(models.Model):
         tank_empty = []
         tank_capacity = []
         for rec in all_tanks:
-            amount = self.ton_amount(rec) + sum(list([-1 * self.ton_amount(re) for re in duration_pro if re.fluid == rec.fluid ]))
-            tank_amounts.append(int(amount / 1000))
-            tank_empty.append(int((rec.capacity - amount) / 1000))
+            # amount = self.ton_amount(rec) + sum(list([-1 * self.ton_amount(re) for re in duration_pro if re.fluid == rec.fluid ]))
+            # tank_amounts.append(int(amount / 1000))
+            # tank_empty.append(int((rec.capacity - amount) / 1000))
+            # tank_capacity.append(int(rec.capacity / 1000))
+            amount = self.ton_amount(rec)
+            tank_amounts.append(amount)
+            tank_empty.append(int((rec.capacity / 1000 - amount)))
             tank_capacity.append(int(rec.capacity / 1000))
 
         # tank_amounts = list([rec.amount for rec in all_tanks ])
