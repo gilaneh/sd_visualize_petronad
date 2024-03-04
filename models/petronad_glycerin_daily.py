@@ -180,7 +180,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                     'textposition': 'top',
                     'textangle': 0,
                         'type': "bar",
-                        'name': "Glycerin Indu",
+                        'name': "Glycerin Pure",
                         'xaxis': 'x1',
                         'width': 0.2,
                         'offset': 0.05,
@@ -261,7 +261,7 @@ class SdVisualizePetronadCalculateDaily(models.Model):
                 #     }
 
                 plot_value = {
-                    'data': [trace12,trace1, trace2,   trace5, trace5, trace9_y ],
+                    'data': [trace12,trace1, trace5, trace9_y ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'plot_bgcolor': 'rgba(255, 255, 255, 0)',
