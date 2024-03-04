@@ -63,11 +63,12 @@ class SdVisualizePetronadCalculate(models.Model):
         month_s_4, month_e_4 = self.month_start_end(this_date, -4, calendar)
         month_s_5, month_e_5 = self.month_start_end(this_date, -5, calendar)
 
-        month_days_0 = ((date.today() if date.today() <= month_e_0 else month_e_0 + timedelta(days=1)) - month_e_1).days
+        today = date.today()
+        month_days_0 = (month_s_0 - (today if today <= month_e_0 else month_e_0 + timedelta(days=1))).days
         month_days_0 = month_days_0 if month_days_0 > 0 else 0
-        month_days_1 = ((date.today() if date.today() <= month_e_1 else month_e_1 + timedelta(days=1)) - month_e_2).days
+        month_days_1 = (month_s_1 - (today if today <= month_e_1 else month_e_1 + timedelta(days=1))).days
         month_days_1 = month_days_1 if month_days_1 > 0 else 0
-        month_days_2 = ((date.today() if date.today() <= month_e_2 else month_e_2 + timedelta(days=1)) - month_e_3).days
+        month_days_2 = (month_s_2 - (today if today <= month_e_2 else month_e_2 + timedelta(days=1))).days
         month_days_2 = month_days_2 if month_days_2 > 0 else 0
 
         month_no_0 = jdatetime.date.fromgregorian(date=month_s_0).month
@@ -344,7 +345,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'width': .3,
                     'offset': 0.2,
                     'yaxis': 'y2',
-                    'name': 'Industry',
+                    'name': 'Pure',
                     'type': 'bar',
                     'marker': {'color': 'rgb(30,80,120)'},
 
@@ -432,7 +433,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'text': [rec if rec > 0 and rec > 0.2 * chart_2_max_range else '' for rec in chart_2_trace1_y],
                     'textangle': 0,
                     'textposition': 'inside',
-                    'name': 'Industry',
+                    'name': 'Pure',
                     'type': 'bar',
                     'yaxis': 'y1',
                     'marker': {'color': 'rgb(30,80,120)'},
