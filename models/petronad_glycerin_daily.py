@@ -146,6 +146,9 @@ class SdVisualizePetronadCalculateDaily(models.Model):
             # TEG
             elif rec.variable_name == 'glycerin_p_1':
                 value = self.float_num(glycerin_p_1, 2)
+            # TEG
+            elif rec.variable_name == 'glycerin_pitch':
+                value = self.float_num(glycerin_pitch_1, 2)
             # Production sum
             elif rec.variable_name == 'sum_of_production':
                 value = self.float_num((glycerin_i_1 + glycerin_p_1), 2)
