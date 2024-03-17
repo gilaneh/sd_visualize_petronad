@@ -113,6 +113,15 @@ class SdVisualizePetronadCalculate(models.Model):
         month_sum_cly_industry_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
                                    if rec.fluid.name in GLY_Industial
                                    and rec.register_type == 'production']))
+        month_sum_cly_pitch_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
+                                   if rec.fluid.name in GLY_Pitch
+                                   and rec.register_type == 'production']))
+        month_sum_cly_pitch_1 = sum(list([self.ton_amount(rec) for rec in month_production_1
+                                   if rec.fluid.name in GLY_Pitch
+                                   and rec.register_type == 'production']))
+        month_sum_cly_pitch_2 = sum(list([self.ton_amount(rec) for rec in month_production_2
+                                   if rec.fluid.name in GLY_Pitch
+                                   and rec.register_type == 'production']))
 
 
         month_sum_sale_cly_industry_0 = sum(list([self.ton_amount(rec) for rec in month_production_0
@@ -298,6 +307,9 @@ class SdVisualizePetronadCalculate(models.Model):
 
             elif rec.variable_name == 'month_production':
                 value = self.float_num(month_sum_production_0, 2)
+
+            elif rec.variable_name == 'month_pitch':
+                value = self.float_num(month_sum_cly_pitch_0, 2)
 
             elif rec.variable_name == 'month_sum_feed':
                 value = self.float_num(month_sum_feed_0, 2)
