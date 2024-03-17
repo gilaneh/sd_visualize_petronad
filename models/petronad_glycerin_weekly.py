@@ -274,7 +274,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': chart_2_y_2,
                     'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in chart_2_y_2],
                     'textangle': 0,
-                    'name': 'Industry',
+                    'name': 'Pure',
                     'type': 'bar',
                     'textposition': 'top',
                     'marker': {
@@ -286,7 +286,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     'y': chart_2_y_3,
                     'text': [rec if rec != 0 and rec > .1 * max_range else '' for rec in chart_2_y_3],
                     'textangle': 0,
-                    'name': 'Pharma',
+                    'name': 'Gly',
                     'type': 'bar',
                     'textposition': 'top',
                     'marker': {
@@ -307,7 +307,7 @@ class SdVisualizePetronadCalculate(models.Model):
                     }
                 }
                 plot_value = {
-                    'data': [trace1, trace2, trace3,  trace4,  ],
+                    'data': [trace1, trace2,  trace4,  ],
                     'layout': {'autosize': False,
                                'paper_bgcolor': 'rgb(255,255,255,0)',
                                'showlegend': True,
